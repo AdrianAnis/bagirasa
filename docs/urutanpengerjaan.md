@@ -38,7 +38,7 @@ Ikuti `setup.md` dari awal sampai akhir.
 - [ ] shadcn/ui terpasang
 - [ ] Dependency inti terpasang
 - [ ] Project Supabase dibuat, `.env.local` terisi
-- [ ] 3 file Supabase client (`client`, `server`, `middleware`)
+- [ ] 4 file Supabase (`env`, `client`, `server`, `middleware`) + `proxy.ts` di root
 - [ ] Design system (Poppins + warna `brand`) aktif
 - [ ] `lib/config.ts` dibuat
 - [ ] Git init + commit + push
@@ -58,7 +58,7 @@ Ikuti `setup.md` dari awal sampai akhir.
 - [ ] Halaman `register` → pilih peran (Penyumbang / Penerima) → jika Penerima, pilih sub-tipe (Panti / Rumah Lansia)
 - [ ] Halaman `login` + logout
 - [ ] Trigger auto-buat `profiles` saat signup
-- [ ] Proteksi route via `middleware.ts` (redirect belum-login)
+- [ ] Proteksi route via `proxy.ts` di root (redirect belum-login)
 - [ ] Guard berbasis peran (donor/recipient/admin akses area masing-masing)
 - [ ] Storage bucket privat untuk KTP & dokumen legal
 

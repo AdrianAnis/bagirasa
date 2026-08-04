@@ -39,7 +39,7 @@ bagirasa/
 │   └── analytics/
 │
 ├── lib/                         # OTAK: semua logika, query, integrasi
-│   ├── supabase/                # client.ts, server.ts, middleware.ts
+│   ├── supabase/                # env.ts, client.ts, server.ts, middleware.ts
 │   ├── db/                      # fungsi query & mutasi per-domain
 │   │   ├── donations.ts
 │   │   ├── recipients.ts
@@ -60,12 +60,15 @@ bagirasa/
 │   └── seed.sql                 # data demo
 │
 ├── public/                      # aset statis
+├── proxy.ts                     # wajib di root — session refresh & proteksi route
 ├── .env.local
+├── components.json              # konfigurasi shadcn/ui
 ├── next.config.ts
-├── tailwind.config.ts
 ├── tsconfig.json
 └── package.json
 ```
+
+> Tailwind v4 tidak memakai `tailwind.config.ts`. Token warna & font didefinisikan lewat blok `@theme` di `app/globals.css`.
 
 ---
 
@@ -117,8 +120,15 @@ Manfaat: logika inti bisa dites terpisah, tidak tercampur boilerplate request/re
 - `shared/` — komponen dipakai ≥ 2 fitur.
 - `components/<fitur>/` — komponen khusus satu fitur.
 
+### `proxy.ts` (root)
+- **File convention Next.js**, wajib berada di root sejajar `app/`. Next memindainya berdasarkan lokasi, bukan lewat `import` — dipindahkan ke folder lain berarti tidak pernah dijalankan, tanpa pesan error apa pun.
+- Berlaku sebagai pengganti `middleware.ts` yang deprecated sejak Next.js 16.
+- Isinya **tipis**: memanggil `updateSession()` dari `lib/supabase/middleware.ts` dan mengekspor `config.matcher`. Logika session dan guard peran hidup di `lib/`.
+- Satu project hanya boleh punya satu file proxy.
+
 ### `lib/`
 - `supabase/` — pembuatan client (browser & server) + helper session.
+- `supabase/env.ts` — validasi environment variable Supabase sekali di satu tempat, supaya file lain tidak perlu non-null assertion (`!`) yang dilarang `aturanpenulisancode.md` §2.
 - `db/` — fungsi query & mutasi per-domain (satu file per entitas).
 - `matching.ts` — algoritma matching & batch, fungsi murni.
 - `gemini.ts`, `fonnte.ts` — wrapper integrasi eksternal, selalu server-side.
