@@ -1,3 +1,5 @@
+import { RoleChooser } from "@/components/auth/RoleChooser";
+
 export default function ChooseRolePage() {
-  return <main>Pilih peran: donor atau penerima</main>;
+  return <RoleChooser />;
 }

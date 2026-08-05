@@ -6,6 +6,14 @@ export const MATCH_WEIGHTS = {
   fairness: 0.25,
 } as const;
 
+export const AUTH_ROUTES = ["/login", "/register", "/choose-role"] as const;
+
+export const ROLE_HOME = {
+  donor: "/donor",
+  recipient: "/recipient",
+  admin: "/admin",
+} as const;
+
 export const BASE_ALLERGENS = [
   "kacang",
   "susu",
