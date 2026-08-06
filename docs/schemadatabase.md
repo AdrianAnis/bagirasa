@@ -331,6 +331,24 @@ create trigger trg_on_auth_user_created after insert on auth.users
 
 ## 6. Ringkasan Kebijakan RLS
 
+> **RLS tidak menggantikan `grant`.** Keduanya lapisan terpisah dan keduanya wajib:
+> `grant` menentukan apakah sebuah peran **boleh menyentuh tabelnya sama sekali**, RLS menentukan **baris mana** yang terlihat. Kalau `grant` tidak ada, Postgres menolak lebih dulu dengan `42501: permission denied for table ...` dan policy RLS tidak pernah sempat dievaluasi — sehingga policy yang benar pun terlihat seperti gagal.
+>
+> Tabel yang dibuat lewat SQL Editor **tidak otomatis** mendapat izin untuk peran `authenticated`. Setiap migration yang membuat tabel baru harus disertai `grant` eksplisit, misalnya:
+>
+> ```sql
+> grant select, insert on public.nama_tabel to authenticated;
+> ```
+>
+> Gunakan `grant` selektif per kolom untuk kolom yang hanya boleh diubah server:
+>
+> ```sql
+> revoke update on public.profiles from authenticated;
+> grant update (email, phone) on public.profiles to authenticated;
+> ```
+>
+> Tanpa pembatasan kolom ini, pengguna bisa mengubah `role` atau `verification_status` miliknya sendiri — RLS saja tidak bisa mencegahnya, karena RLS bekerja di level baris, bukan kolom.
+
 Aktifkan RLS di semua tabel, lalu terapkan prinsip:
 
 | Tabel | Kebijakan |
@@ -359,7 +377,30 @@ create policy "admin baca semua donor" on donors
 
 ---
 
-## 7. Catatan Implementasi
+## 7. Storage
+
+Bucket **`identity-documents`** (privat) menyimpan file yang dirujuk kolom `donors.ktp_url` dan `recipients.legal_doc_url`. Kolom di database hanya menyimpan alamat; filenya hidup di bucket.
+
+**Konvensi path wajib:** setiap file disimpan dengan ID pengguna sebagai folder terdepan.
+
+```
+identity-documents/<auth.uid()>/ktp.jpg
+identity-documents/<auth.uid()>/legal-doc.pdf
+```
+
+Policy storage mencocokkan folder terdepan dengan ID pengguna yang sedang login:
+
+```sql
+(storage.foldername(name))[1] = (select auth.uid())::text
+```
+
+File yang ditaruh di akar bucket tanpa folder ID **akan ditolak** dengan error izin. Pemilik dokumen boleh unggah, baca, ganti, dan hapus di foldernya sendiri; admin boleh membaca semua untuk keperluan verifikasi.
+
+Bucket dibatasi 5 MB per file dan hanya menerima `image/jpeg`, `image/png`, `image/webp`, `application/pdf`.
+
+---
+
+## 8. Catatan Implementasi
 
 - Generate tipe TypeScript dari schema: `supabase gen types typescript` → dipakai di seluruh kode.
 - Operasi sensitif (kirim WA, panggil Gemini, tulis `wa_logs`/`waste_insights`) dijalankan server-side dengan service role, bukan dari client.

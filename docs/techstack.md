@@ -20,6 +20,7 @@ Ringkasan teknologi yang dipakai beserta alasannya, selaras dengan tema lomba *N
 | Validasi | Zod |
 | Form | React Hook Form |
 | Charts | Recharts |
+| Peta | Leaflet + react-leaflet (OpenStreetMap) |
 | AI | Google Gemini API (`@google/generative-ai`) |
 | WhatsApp Gateway | Fonnte |
 | Toast/Notif UI | sonner |
@@ -76,6 +77,12 @@ Token warna & tipografi didefinisikan sekali di config Tailwind dan dipakai kons
 ### Charts — Recharts
 - Visualisasi analitik dashboard (tren donasi, food waste tersalurkan).
 
+### Peta — Leaflet + react-leaflet
+- Dipakai memilih koordinat restoran dan penerima (`lat`, `lng`) dengan menggeser pin, bukan mengetik angka manual.
+- Ubin peta dari OpenStreetMap: gratis, tanpa API key, tanpa kartu kredit — berbeda dari Google Maps.
+- Koordinat adalah masukan utama algoritma matching (`prd.md` §10.2), jadi ketepatannya berdampak langsung ke kualitas rekomendasi.
+- Komponen peta wajib dimuat dengan `dynamic(..., { ssr: false })` karena Leaflet mengakses `window` saat modul dievaluasi.
+
 ### Deployment — Vercel
 - Integrasi native dengan Next.js, deploy otomatis dari Git, environment variables aman.
 
@@ -117,6 +124,8 @@ Aturan:
     "react-hook-form": "latest",
     "@hookform/resolvers": "latest",
     "recharts": "latest",
+    "leaflet": "latest",
+    "react-leaflet": "latest",
     "lucide-react": "latest",
     "sonner": "latest",
     "clsx": "latest",
