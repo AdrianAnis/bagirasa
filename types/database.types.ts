@@ -508,6 +508,20 @@ export type Database = {
         Returns: boolean
       }
       owns_donation: { Args: { target_donation_id: string }; Returns: boolean }
+      verified_recipients: {
+        Args: never
+        Returns: {
+          allergen_restrictions: string[]
+          capacity: number
+          current_need: number
+          halal_only: boolean
+          id: string
+          last_received_at: string
+          lat: number
+          lng: number
+          name: string
+        }[]
+      }
     }
     Enums: {
       donation_status:

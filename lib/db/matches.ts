@@ -64,12 +64,7 @@ async function loadDonationContext(
 async function loadCandidates(): Promise<MatchCandidate[]> {
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from("recipients")
-    .select(
-      "id, name, lat, lng, capacity, current_need, allergen_restrictions, halal_only, last_received_at, profiles!inner(verification_status)",
-    )
-    .eq("profiles.verification_status", "verified");
+  const { data } = await supabase.rpc("verified_recipients");
 
   if (!data) {
     return [];

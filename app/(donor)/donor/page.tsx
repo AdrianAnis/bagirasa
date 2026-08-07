@@ -21,11 +21,24 @@ export default async function DonorDashboardPage() {
     listDonorDonations(),
   ]);
 
+  const countServings = (donation: (typeof donations)[number]) =>
+    donation.food_items.reduce((sum, item) => sum + item.servings, 0);
+
   const totalServings = donations.reduce(
-    (total, donation) =>
-      total + donation.food_items.reduce((sum, item) => sum + item.servings, 0),
+    (total, donation) => total + countServings(donation),
     0,
   );
+
+  const distributedServings = donations
+    .filter(
+      (donation) =>
+        donation.status === "matched" || donation.status === "completed",
+    )
+    .reduce((total, donation) => total + countServings(donation), 0);
+
+  const pendingDonations = donations.filter(
+    (donation) => donation.status === "available",
+  ).length;
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-12">
@@ -64,8 +77,11 @@ export default async function DonorDashboardPage() {
         <CardHeader>
           <CardTitle>Ringkasan</CardTitle>
           <CardDescription>
-            {donations.length} donasi · {totalServings} porsi tersalurkan ·
-            status verifikasi {profile?.verification_status}
+            {donations.length} donasi · {totalServings} porsi dicatat ·{" "}
+            {distributedServings} porsi tersalurkan
+            {pendingDonations > 0
+              ? ` · ${pendingDonations} donasi menunggu disalurkan`
+              : ""}
           </CardDescription>
         </CardHeader>
       </Card>

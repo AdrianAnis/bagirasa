@@ -6,6 +6,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { LatLng } from "@/components/shared/LocationPickerMap";
 
+const SEMARANG_CENTER: LatLng = { lat: -6.9932, lng: 110.4203 };
+
 const LocationPickerMap = dynamic(
   () => import("@/components/shared/LocationPickerMap"),
   {
@@ -58,15 +60,25 @@ export function LocationPicker({ value, onChange, error }: LocationPickerProps) 
         <p className="text-sm text-muted-foreground">
           Klik peta untuk menaruh pin, atau geser pin yang sudah ada.
         </p>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={useMyLocation}
-          disabled={isLocating}
-        >
-          {isLocating ? "Mencari..." : "Gunakan lokasi saya"}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => onChange(SEMARANG_CENTER)}
+          >
+            Pusat Semarang
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={useMyLocation}
+            disabled={isLocating}
+          >
+            {isLocating ? "Mencari..." : "Gunakan lokasi saya"}
+          </Button>
+        </div>
       </div>
 
       <LocationPickerMap value={value} onPick={onChange} />
