@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -73,6 +76,14 @@ export function DonationList({ donations }: DonationListProps) {
                   </span>
                 </div>
               ))}
+
+              {donation.status === "available" ? (
+                <Button asChild size="sm" className="mt-2 self-start">
+                  <Link href={`/donor/donations/${donation.id}`}>
+                    Salurkan donasi
+                  </Link>
+                </Button>
+              ) : null}
             </CardContent>
           </Card>
         );

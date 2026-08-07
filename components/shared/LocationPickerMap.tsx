@@ -10,7 +10,7 @@ export type LatLng = {
   lng: number;
 };
 
-const SEMARANG_CENTER: LatLng = { lat: -6.9932, lng: 110.4203 };
+export const SEMARANG_CENTER: LatLng = { lat: -6.9932, lng: 110.4203 };
 
 const pinIcon = divIcon({
   className: "",

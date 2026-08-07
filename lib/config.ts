@@ -1,5 +1,9 @@
 export const MAX_RADIUS_KM = 15;
 
+export const FAIRNESS_HORIZON_DAYS = 30;
+
+export const EARTH_RADIUS_KM = 6371;
+
 export const MATCH_WEIGHTS = {
   distance: 0.4,
   need: 0.35,

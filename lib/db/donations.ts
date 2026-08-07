@@ -62,6 +62,27 @@ export async function createDonation(
   return { ok: true, data: donation };
 }
 
+export async function getDonationById(
+  donationId: string,
+): Promise<DonationWithItems | null> {
+  const donor = await getCurrentDonor();
+
+  if (!donor) {
+    return null;
+  }
+
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("food_donations")
+    .select("*, food_items(*)")
+    .eq("id", donationId)
+    .eq("donor_id", donor.id)
+    .maybeSingle();
+
+  return data;
+}
+
 export async function listDonorDonations(): Promise<DonationWithItems[]> {
   const donor = await getCurrentDonor();
 
