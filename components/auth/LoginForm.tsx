@@ -31,7 +31,11 @@ export function LoginForm() {
     });
 
     if (error) {
-      toast.error("Email atau password salah");
+      toast.error(
+        error.code === "invalid_credentials"
+          ? "Email atau password salah"
+          : `Gagal masuk: ${error.message}`,
+      );
       return;
     }
 

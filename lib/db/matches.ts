@@ -1,4 +1,6 @@
 import { getCurrentDonor } from "@/lib/db/donors";
+import { getCurrentRecipient } from "@/lib/db/recipients";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   allocateAuto,
   allocateManual,
@@ -16,6 +18,18 @@ export type DonationMatch =
 export type MatchingResult =
   | { ok: true; data: MatchingOutcome }
   | { ok: false; error: string };
+
+export type ActionResult = { ok: true } | { ok: false; error: string };
+
+export type IncomingMatch = DonationMatch & {
+  food_donations: {
+    id: string;
+    notes: string | null;
+    created_at: string;
+    donors: { name: string; address: string; phone: string } | null;
+    food_items: Database["public"]["Tables"]["food_items"]["Row"][];
+  } | null;
+};
 
 type DonationContext = {
   donorLocation: Coordinate;
@@ -105,6 +119,137 @@ export async function previewMatches(
     : allocateAuto(context.donorLocation, context.donation, candidates);
 
   return { ok: true, data: outcome };
+}
+
+export async function listRecipientMatches(): Promise<IncomingMatch[]> {
+  const recipient = await getCurrentRecipient();
+
+  if (!recipient) {
+    return [];
+  }
+
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("donation_matches")
+    .select(
+      "*, food_donations(id, notes, created_at, donors(name, address, phone), food_items(*))",
+    )
+    .eq("recipient_id", recipient.id)
+    .order("created_at", { ascending: false });
+
+  return data ?? [];
+}
+
+async function loadOwnedMatch(matchId: string) {
+  const recipient = await getCurrentRecipient();
+
+  if (!recipient) {
+    return null;
+  }
+
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("donation_matches")
+    .select("id, status, allocated_servings, recipient_id, donation_id")
+    .eq("id", matchId)
+    .eq("recipient_id", recipient.id)
+    .maybeSingle();
+
+  if (!data) {
+    return null;
+  }
+
+  return { match: data, recipient };
+}
+
+export async function respondToMatch(
+  matchId: string,
+  accept: boolean,
+): Promise<ActionResult> {
+  const owned = await loadOwnedMatch(matchId);
+
+  if (!owned) {
+    return { ok: false, error: "Donasi tidak ditemukan" };
+  }
+
+  if (owned.match.status !== "pending") {
+    return { ok: false, error: "Donasi ini sudah pernah direspons" };
+  }
+
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("donation_matches")
+    .update({
+      status: accept ? "accepted" : "rejected",
+      responded_at: new Date().toISOString(),
+    })
+    .eq("id", matchId);
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  return { ok: true };
+}
+
+export async function confirmHandover(matchId: string): Promise<ActionResult> {
+  const owned = await loadOwnedMatch(matchId);
+
+  if (!owned) {
+    return { ok: false, error: "Donasi tidak ditemukan" };
+  }
+
+  if (owned.match.status !== "accepted") {
+    return { ok: false, error: "Terima donasi ini terlebih dahulu" };
+  }
+
+  const supabase = await createClient();
+  const handedOverAt = new Date().toISOString();
+
+  const { error } = await supabase
+    .from("donation_matches")
+    .update({ status: "completed", handed_over_at: handedOverAt })
+    .eq("id", matchId);
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  const admin = createAdminClient();
+  const nextNeed = Math.max(
+    0,
+    owned.recipient.current_need - owned.match.allocated_servings,
+  );
+
+  const { error: recipientError } = await admin
+    .from("recipients")
+    .update({ current_need: nextNeed, last_received_at: handedOverAt })
+    .eq("id", owned.recipient.id);
+
+  if (recipientError) {
+    return { ok: false, error: recipientError.message };
+  }
+
+  const { data: siblings } = await admin
+    .from("donation_matches")
+    .select("status")
+    .eq("donation_id", owned.match.donation_id);
+
+  const allSettled = (siblings ?? []).every(
+    (row) => row.status === "completed" || row.status === "rejected",
+  );
+
+  if (allSettled) {
+    await admin
+      .from("food_donations")
+      .update({ status: "completed" })
+      .eq("id", owned.match.donation_id);
+  }
+
+  return { ok: true };
 }
 
 export async function commitMatches(
