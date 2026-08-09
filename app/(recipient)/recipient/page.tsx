@@ -1,23 +1,15 @@
 import Link from "next/link";
 
 import { IncomingDonationCard } from "@/components/recipient/IncomingDonationCard";
-import { LogoutButton } from "@/components/shared/LogoutButton";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { listRecipientMatches } from "@/lib/db/matches";
-import { getCurrentProfile } from "@/lib/db/profiles";
 import { getCurrentRecipient } from "@/lib/db/recipients";
 import { RECIPIENT_TYPE_LABEL } from "@/lib/validations/recipient";
 
 export default async function RecipientDashboardPage() {
-  const [profile, recipient, matches] = await Promise.all([
-    getCurrentProfile(),
+  const [recipient, matches] = await Promise.all([
     getCurrentRecipient(),
     listRecipientMatches(),
   ]);
@@ -32,78 +24,95 @@ export default async function RecipientDashboardPage() {
     .filter((match) => match.status === "completed")
     .reduce((total, match) => total + match.allocated_servings, 0);
 
-  return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-12">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-brand">
-            Dashboard Penerima
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">{profile?.email}</p>
-        </div>
-        <LogoutButton />
-      </div>
+  const stats = [
+    { label: "Menunggu jawaban", value: incoming.length },
+    { label: "Menunggu penyerahan", value: inProgress.length },
+    { label: "Kebutuhan porsi", value: recipient?.current_need ?? 0 },
+    { label: "Porsi diterima", value: receivedServings },
+  ];
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Profil lembaga</CardTitle>
-          <CardDescription>
-            {recipient
-              ? `${recipient.name} · ${RECIPIENT_TYPE_LABEL[recipient.type]} · butuh ${recipient.current_need} porsi`
-              : "Belum dilengkapi. Donasi baru bisa masuk setelah profil terisi."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+  return (
+    <div className="flex flex-col gap-10">
+      <PageHeader
+        eyebrow={
+          recipient ? RECIPIENT_TYPE_LABEL[recipient.type] : "Penerima"
+        }
+        title={recipient?.name ?? "Dashboard penerima"}
+        description={
+          recipient
+            ? recipient.address
+            : "Lengkapi profil lembaga dulu. Donasi baru bisa masuk setelah lokasi, kapasitas, dan pantangan alergen terisi."
+        }
+        actions={
           <Button asChild variant={recipient ? "outline" : "default"}>
             <Link href="/recipient/profile">
               {recipient ? "Ubah profil" : "Lengkapi profil"}
             </Link>
           </Button>
-        </CardContent>
-      </Card>
+        }
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Ringkasan</CardTitle>
-          <CardDescription>
-            {incoming.length} donasi menunggu jawaban · {inProgress.length}{" "}
-            menunggu penyerahan · {receivedServings} porsi sudah diterima
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      {recipient ? (
+        <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-4">
+          {stats.map((stat) => (
+            <div key={stat.label} className="bg-white px-5 py-6">
+              <dt className="eyebrow text-brand-ink/40">{stat.label}</dt>
+              <dd className="numeric mt-2 text-3xl font-semibold text-brand-ink">
+                {stat.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
 
       {incoming.length > 0 ? (
-        <div className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Donasi masuk</h2>
+        <section className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold text-brand-ink">Donasi masuk</h2>
           {incoming.map((match) => (
             <IncomingDonationCard key={match.id} match={match} />
           ))}
-        </div>
+        </section>
       ) : null}
 
       {inProgress.length > 0 ? (
-        <div className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold">Menunggu penyerahan</h2>
+        <section className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold text-brand-ink">
+            Menunggu penyerahan
+          </h2>
           {inProgress.map((match) => (
             <IncomingDonationCard key={match.id} match={match} />
           ))}
-        </div>
+        </section>
       ) : null}
 
-      <div className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Histori penerimaan</h2>
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold text-brand-ink">
+          Histori penerimaan
+        </h2>
         {history.length === 0 ? (
-          <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            {recipient
-              ? "Belum ada riwayat. Donasi yang kamu terima akan muncul di sini."
-              : "Lengkapi profil lembaga dulu agar bisa menerima donasi."}
-          </p>
+          <EmptyState
+            title={
+              recipient ? "Belum ada riwayat" : "Profil lembaga belum lengkap"
+            }
+            description={
+              recipient
+                ? "Donasi yang kamu terima atau tolak akan tercatat di sini."
+                : "Isi kapasitas, kebutuhan porsi, dan pantangan alergen agar donasi bisa dicocokkan denganmu."
+            }
+            action={
+              recipient ? null : (
+                <Button asChild>
+                  <Link href="/recipient/profile">Lengkapi profil</Link>
+                </Button>
+              )
+            }
+          />
         ) : (
           history.map((match) => (
             <IncomingDonationCard key={match.id} match={match} />
           ))
         )}
-      </div>
-    </main>
+      </section>
+    </div>
   );
 }

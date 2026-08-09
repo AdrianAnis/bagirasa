@@ -1,21 +1,19 @@
-import { LogoutButton } from "@/components/shared/LogoutButton";
-import { getCurrentProfile } from "@/lib/db/profiles";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { PageHeader } from "@/components/shared/PageHeader";
 
-export default async function AdminPage() {
-  const profile = await getCurrentProfile();
-
+export default function AdminPage() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-12">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-brand">Panel Admin</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{profile?.email}</p>
-        </div>
-        <LogoutButton />
-      </div>
-      <p className="text-sm text-muted-foreground">
-        Verifikasi akun donor dan penerima dikerjakan di Fase 8.
-      </p>
-    </main>
+    <div className="flex flex-col gap-10">
+      <PageHeader
+        eyebrow="Admin"
+        title="Verifikasi akun"
+        description="Memeriksa dokumen identitas restoran dan lembaga penerima sebelum akun bisa bertransaksi."
+      />
+
+      <EmptyState
+        title="Panel verifikasi belum tersedia"
+        description="Daftar akun menunggu verifikasi beserta dokumen identitasnya akan muncul di sini."
+      />
+    </div>
   );
 }

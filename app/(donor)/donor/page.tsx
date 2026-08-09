@@ -1,33 +1,20 @@
 import Link from "next/link";
 
 import { DonationList } from "@/components/donation/DonationList";
-import { LogoutButton } from "@/components/shared/LogoutButton";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { listDonorDonations } from "@/lib/db/donations";
 import { getCurrentDonor } from "@/lib/db/donors";
-import { getCurrentProfile } from "@/lib/db/profiles";
 
 export default async function DonorDashboardPage() {
-  const [profile, donor, donations] = await Promise.all([
-    getCurrentProfile(),
+  const [donor, donations] = await Promise.all([
     getCurrentDonor(),
     listDonorDonations(),
   ]);
 
   const countServings = (donation: (typeof donations)[number]) =>
     donation.food_items.reduce((sum, item) => sum + item.servings, 0);
-
-  const totalServings = donations.reduce(
-    (total, donation) => total + countServings(donation),
-    0,
-  );
 
   const distributedServings = donations
     .filter(
@@ -40,56 +27,70 @@ export default async function DonorDashboardPage() {
     (donation) => donation.status === "available",
   ).length;
 
-  return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-12">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-brand">Dashboard Donor</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{profile?.email}</p>
-        </div>
-        <LogoutButton />
-      </div>
+  const stats = [
+    { label: "Donasi dibuat", value: donations.length },
+    { label: "Porsi tersalurkan", value: distributedServings },
+    { label: "Menunggu disalurkan", value: pendingDonations },
+  ];
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Profil restoran</CardTitle>
-          <CardDescription>
-            {donor
-              ? `${donor.name} — ${donor.address}`
-              : "Belum dilengkapi. Donasi baru bisa dibuat setelah profil restoran terisi."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-3">
-          <Button asChild variant={donor ? "outline" : "default"}>
-            <Link href="/donor/profile">
-              {donor ? "Ubah profil" : "Lengkapi profil"}
-            </Link>
-          </Button>
-          {donor ? (
+  return (
+    <div className="flex flex-col gap-10">
+      <PageHeader
+        eyebrow="Penyumbang"
+        title={donor?.name ?? "Dashboard donor"}
+        description={
+          donor
+            ? donor.address
+            : "Lengkapi profil restoran dulu. Donasi baru bisa dibuat setelah lokasi dan dokumen terisi."
+        }
+        actions={
+          donor ? (
             <Button asChild>
               <Link href="/donor/donations/new">Buat donasi</Link>
             </Button>
-          ) : null}
-        </CardContent>
-      </Card>
+          ) : (
+            <Button asChild>
+              <Link href="/donor/profile">Lengkapi profil</Link>
+            </Button>
+          )
+        }
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Ringkasan</CardTitle>
-          <CardDescription>
-            {donations.length} donasi · {totalServings} porsi dicatat ·{" "}
-            {distributedServings} porsi tersalurkan
-            {pendingDonations > 0
-              ? ` · ${pendingDonations} donasi menunggu disalurkan`
-              : ""}
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      {donor ? (
+        <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-3">
+          {stats.map((stat) => (
+            <div key={stat.label} className="bg-white px-5 py-6">
+              <dt className="eyebrow text-brand-ink/40">{stat.label}</dt>
+              <dd className="numeric mt-2 text-3xl font-semibold text-brand-ink">
+                {stat.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
 
-      <div className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold">Histori donasi</h2>
-        <DonationList donations={donations} />
-      </div>
-    </main>
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold text-brand-ink">Histori donasi</h2>
+        {donations.length === 0 ? (
+          <EmptyState
+            title="Belum ada donasi"
+            description={
+              donor
+                ? "Catat sisa makanan hari ini, lalu salurkan ke panti terdekat yang membutuhkan."
+                : "Lengkapi profil restoran dulu sebelum membuat donasi pertama."
+            }
+            action={
+              <Button asChild>
+                <Link href={donor ? "/donor/donations/new" : "/donor/profile"}>
+                  {donor ? "Buat donasi" : "Lengkapi profil"}
+                </Link>
+              </Button>
+            }
+          />
+        ) : (
+          <DonationList donations={donations} />
+        )}
+      </section>
+    </div>
   );
 }
