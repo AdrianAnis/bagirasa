@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { RecipientProfileForm } from "@/components/recipient/RecipientProfileForm";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { getCurrentProfile } from "@/lib/db/profiles";
 import { getCurrentRecipient } from "@/lib/db/recipients";
 import { createClient } from "@/lib/supabase/server";
@@ -29,24 +29,20 @@ export default async function RecipientProfilePage() {
     RECIPIENT_TYPES.find((type) => type === metadataType) ?? "panti_asuhan";
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-12">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand">Profil Lembaga</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Data ini menentukan donasi mana yang aman dikirimkan kepadamu.
-          Pantangan alergen dan status halal dipakai sebagai penyaring wajib.
-        </p>
-      </div>
-
-      <RecipientProfileForm
-        userId={profile.id}
-        recipient={recipient}
-        defaultType={defaultType}
+    <div className="flex flex-col gap-10">
+      <PageHeader
+        eyebrow="Penerima"
+        title="Profil lembaga"
+        description="Pantangan alergen dan status halal dipakai sebagai penyaring wajib. Donasi yang bertentangan tidak akan pernah dikirimkan kepadamu."
       />
 
-      <Link href="/recipient" className="text-sm text-brand underline">
-        Kembali ke dashboard
-      </Link>
-    </main>
+      <div className="max-w-2xl">
+        <RecipientProfileForm
+          userId={profile.id}
+          recipient={recipient}
+          defaultType={defaultType}
+        />
+      </div>
+    </div>
   );
 }

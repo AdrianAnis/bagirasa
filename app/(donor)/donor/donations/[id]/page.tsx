@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { MatchingPanel } from "@/components/donation/MatchingPanel";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { getDonationById } from "@/lib/db/donations";
 import { previewMatches } from "@/lib/db/matches";
 
@@ -37,25 +37,22 @@ export default async function DonationMatchingPage({
   );
 
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-12">
-      <div>
-        <h1 className="text-2xl font-semibold text-brand">Salurkan Donasi</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {donation.food_items.length} item · {totalServings} porsi ·{" "}
-          {isHalal ? "halal" : "non-halal"}
-          {allergens.length > 0 ? ` · alergen: ${allergens.join(", ")}` : ""}
-        </p>
-      </div>
-
-      <MatchingPanel
-        donationId={donation.id}
-        totalServings={totalServings}
-        initialOutcome={preview.data}
+    <div className="flex flex-col gap-10">
+      <PageHeader
+        eyebrow="Penyaluran"
+        title={`${totalServings} porsi siap disalurkan`}
+        description={`${donation.food_items.length} item · ${
+          isHalal ? "halal" : "non-halal"
+        }${allergens.length > 0 ? ` · alergen: ${allergens.join(", ")}` : " · tanpa alergen tercatat"}`}
       />
 
-      <Link href="/donor" className="text-sm text-brand underline">
-        Kembali ke dashboard
-      </Link>
-    </main>
+      <div className="max-w-2xl">
+        <MatchingPanel
+          donationId={donation.id}
+          totalServings={totalServings}
+          initialOutcome={preview.data}
+        />
+      </div>
+    </div>
   );
 }

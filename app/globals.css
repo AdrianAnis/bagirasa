@@ -6,6 +6,33 @@
 
 @theme {
   --color-brand: #23674e;
+  --color-brand-deep: #14392c;
+  --color-brand-ink: #10241c;
+  --color-brand-tint: #e8f0ec;
+  --color-canvas: #f7f8f7;
+  --font-mono: var(--font-plex-mono);
+  --text-display: 3.25rem;
+  --text-display--line-height: 1.04;
+  --text-display--letter-spacing: -0.035em;
+  --text-title: 2rem;
+  --text-title--line-height: 1.15;
+  --text-title--letter-spacing: -0.02em;
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1.2;
+  --text-eyebrow--letter-spacing: 0.16em;
+}
+
+@utility eyebrow {
+  font-family: var(--font-plex-mono);
+  font-size: var(--text-eyebrow);
+  letter-spacing: var(--text-eyebrow--letter-spacing);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+@utility numeric {
+  font-family: var(--font-plex-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 @theme inline {
