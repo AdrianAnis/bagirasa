@@ -14,14 +14,10 @@ import type { Recipient } from "@/lib/db/recipients";
 import { uploadIdentityDocument } from "@/lib/supabase/storage";
 import {
   RECIPIENT_TYPE_LABEL,
-  RECIPIENT_TYPES,
   recipientProfileCreateSchema,
   recipientProfileUpdateSchema,
   type RecipientProfileFormInput,
 } from "@/lib/validations/recipient";
-
-const SELECT_CLASS =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
 type RecipientProfileFormProps = {
   userId: string;
@@ -118,15 +114,17 @@ export function RecipientProfileForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+      <input type="hidden" {...register("type")} />
+
       <div className="flex flex-col gap-2">
-        <Label htmlFor="type">Jenis lembaga</Label>
-        <select id="type" className={SELECT_CLASS} {...register("type")}>
-          {RECIPIENT_TYPES.map((type) => (
-            <option key={type} value={type}>
-              {RECIPIENT_TYPE_LABEL[type]}
-            </option>
-          ))}
-        </select>
+        <Label>Jenis lembaga</Label>
+        <p className="rounded-md border bg-muted/40 px-3 py-2 text-sm">
+          {RECIPIENT_TYPE_LABEL[recipient?.type ?? defaultType]}
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Ditentukan saat pendaftaran dan tidak bisa diubah. Hubungi admin bila
+          ada kekeliruan.
+        </p>
       </div>
 
       <div className="flex flex-col gap-2">
