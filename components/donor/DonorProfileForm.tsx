@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
+import { Field, FormSection } from "@/components/shared/Field";
 import { LocationPicker } from "@/components/shared/LocationPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import type { Donor } from "@/lib/db/donors";
 import { uploadIdentityDocument } from "@/lib/supabase/storage";
 import {
@@ -91,32 +91,32 @@ export function DonorProfileForm({ userId, donor }: DonorProfileFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="name">Nama restoran</Label>
-        <Input id="name" {...register("name")} />
-        {errors.name ? (
-          <p className="text-sm text-destructive">{errors.name.message}</p>
-        ) : null}
-      </div>
+      <FormSection title="Identitas restoran">
+        <Field label="Nama restoran" htmlFor="name" error={errors.name?.message}>
+          <Input id="name" {...register("name")} />
+        </Field>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="address">Alamat lengkap</Label>
-        <Input id="address" {...register("address")} />
-        {errors.address ? (
-          <p className="text-sm text-destructive">{errors.address.message}</p>
-        ) : null}
-      </div>
+        <Field
+          label="Alamat lengkap"
+          htmlFor="address"
+          error={errors.address?.message}
+        >
+          <Input id="address" {...register("address")} />
+        </Field>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="phone">Nomor telepon</Label>
-        <Input id="phone" inputMode="numeric" {...register("phone")} />
-        {errors.phone ? (
-          <p className="text-sm text-destructive">{errors.phone.message}</p>
-        ) : null}
-      </div>
+        <Field
+          label="Nomor telepon"
+          htmlFor="phone"
+          error={errors.phone?.message}
+        >
+          <Input id="phone" inputMode="numeric" {...register("phone")} />
+        </Field>
+      </FormSection>
 
-      <div className="flex flex-col gap-2">
-        <Label>Titik lokasi restoran</Label>
+      <FormSection
+        title="Titik lokasi"
+        description="Jarak dari titik ini ke lembaga penerima menentukan urutan rekomendasi."
+      >
         <LocationPicker
           value={position}
           onChange={(next) => {
@@ -125,33 +125,31 @@ export function DonorProfileForm({ userId, donor }: DonorProfileFormProps) {
           }}
           error={errors.lat?.message ?? errors.lng?.message}
         />
-      </div>
+      </FormSection>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="ktpFile">
-          Dokumen KTP pemilik {isEditing ? "(kosongkan bila tidak diganti)" : ""}
-        </Label>
-        <Input
-          id="ktpFile"
-          type="file"
-          accept="image/jpeg,image/png,image/webp,application/pdf"
-          onChange={(event) => {
-            const file = event.target.files?.[0];
-            setValue("ktpFile", file, { shouldValidate: true });
-          }}
-        />
-        {errors.ktpFile ? (
-          <p className="text-sm text-destructive">
-            {errors.ktpFile.message as string}
-          </p>
-        ) : null}
-        <p className="text-sm text-muted-foreground">
-          Maksimal 5 MB. Format JPG, PNG, WEBP, atau PDF. Dokumen disimpan di
-          penyimpanan privat dan hanya bisa dibuka olehmu dan admin.
-        </p>
-      </div>
+      <FormSection
+        title="Dokumen verifikasi"
+        description="Diperiksa admin sebelum akun bisa menyalurkan donasi."
+      >
+        <Field
+          label={`Dokumen KTP pemilik${isEditing ? " (kosongkan bila tidak diganti)" : ""}`}
+          htmlFor="ktpFile"
+          hint="Maksimal 5 MB. Format JPG, PNG, WEBP, atau PDF. Disimpan di penyimpanan privat — hanya bisa dibuka olehmu dan admin."
+          error={errors.ktpFile?.message as string | undefined}
+        >
+          <Input
+            id="ktpFile"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,application/pdf"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              setValue("ktpFile", file, { shouldValidate: true });
+            }}
+          />
+        </Field>
+      </FormSection>
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} size="lg">
         {isSubmitting ? "Menyimpan..." : "Simpan profil"}
       </Button>
     </form>

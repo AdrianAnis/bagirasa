@@ -13,7 +13,7 @@ const LocationPickerMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-72 w-full items-center justify-center rounded-lg border text-sm text-muted-foreground">
+      <div className="flex h-72 w-full items-center justify-center rounded-lg border text-sm text-brand-ink/55">
         Memuat peta...
       </div>
     ),
@@ -57,7 +57,7 @@ export function LocationPicker({ value, onChange, error }: LocationPickerProps) 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-brand-ink/55">
           Klik peta untuk menaruh pin, atau geser pin yang sudah ada.
         </p>
         <div className="flex flex-wrap gap-2">
@@ -84,17 +84,17 @@ export function LocationPicker({ value, onChange, error }: LocationPickerProps) 
       <LocationPickerMap value={value} onPick={onChange} />
 
       {value ? (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-brand-ink/55">
           Titik terpilih: {value.lat.toFixed(6)}, {value.lng.toFixed(6)}
         </p>
       ) : (
-        <p className="text-sm text-muted-foreground">Belum ada titik dipilih.</p>
+        <p className="text-sm text-brand-ink/55">Belum ada titik dipilih.</p>
       )}
 
       {locateError ? (
-        <p className="text-sm text-destructive">{locateError}</p>
+        <p className="text-sm text-red-700">{locateError}</p>
       ) : null}
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+      {error ? <p className="text-sm text-red-700">{error}</p> : null}
     </div>
   );
 }

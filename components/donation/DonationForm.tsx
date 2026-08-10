@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
+import { Field } from "@/components/shared/Field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,215 +76,213 @@ export function DonationForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
       {fields.map((field, index) => (
-        <div key={field.id} className="flex flex-col gap-4 rounded-lg border p-4">
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="font-semibold">Item {index + 1}</h2>
+        <section
+          key={field.id}
+          className="rounded-xl border border-brand-ink/10 bg-white p-5"
+        >
+          <div className="flex items-center justify-between gap-4 border-b border-brand-ink/10 pb-4">
+            <h2 className="eyebrow text-brand/70">Item {index + 1}</h2>
             {fields.length > 1 ? (
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => remove(index)}
+                className="text-brand-ink/50 hover:text-red-700"
               >
-                Hapus
+                Hapus item
               </Button>
             ) : null}
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor={`items.${index}.name`}>Nama makanan</Label>
-            <Input
-              id={`items.${index}.name`}
-              {...register(`items.${index}.name`)}
-            />
-            {errors.items?.[index]?.name ? (
-              <p className="text-sm text-destructive">
-                {errors.items[index]?.name?.message}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor={`items.${index}.foodType`}>Jenis makanan</Label>
-              <select
-                id={`items.${index}.foodType`}
-                className={SELECT_CLASS}
-                {...register(`items.${index}.foodType`)}
-              >
-                {FOOD_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {FOOD_TYPE_LABEL[type]}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor={`items.${index}.shelfLifeHours`}>
-                Ketahanan (jam)
-              </Label>
+          <div className="flex flex-col gap-5 pt-5">
+            <Field
+              label="Nama makanan"
+              htmlFor={`items.${index}.name`}
+              error={errors.items?.[index]?.name?.message}
+            >
               <Input
-                id={`items.${index}.shelfLifeHours`}
-                type="number"
-                min={1}
-                max={168}
-                {...register(`items.${index}.shelfLifeHours`, {
-                  valueAsNumber: true,
-                })}
+                id={`items.${index}.name`}
+                {...register(`items.${index}.name`)}
               />
-              {errors.items?.[index]?.shelfLifeHours ? (
-                <p className="text-sm text-destructive">
-                  {errors.items[index]?.shelfLifeHours?.message}
-                </p>
-              ) : null}
-            </div>
-          </div>
+            </Field>
 
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor={`items.${index}.quantity`}>Kuantitas</Label>
-              <Input
-                id={`items.${index}.quantity`}
-                type="number"
-                min={1}
-                {...register(`items.${index}.quantity`, { valueAsNumber: true })}
-              />
-              {errors.items?.[index]?.quantity ? (
-                <p className="text-sm text-destructive">
-                  {errors.items[index]?.quantity?.message}
-                </p>
-              ) : null}
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor={`items.${index}.unit`}>Satuan</Label>
-              <Input
-                id={`items.${index}.unit`}
-                {...register(`items.${index}.unit`)}
-              />
-              {errors.items?.[index]?.unit ? (
-                <p className="text-sm text-destructive">
-                  {errors.items[index]?.unit?.message}
-                </p>
-              ) : null}
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor={`items.${index}.servings`}>Estimasi porsi</Label>
-              <Input
-                id={`items.${index}.servings`}
-                type="number"
-                min={1}
-                {...register(`items.${index}.servings`, { valueAsNumber: true })}
-              />
-              {errors.items?.[index]?.servings ? (
-                <p className="text-sm text-destructive">
-                  {errors.items[index]?.servings?.message}
-                </p>
-              ) : null}
-            </div>
-          </div>
-
-          <p className="text-sm text-muted-foreground">
-            Kuantitas adalah cara makanan dikemas (mis. 2 tray, 5 box).
-            Estimasi porsi adalah berapa orang yang bisa dikenyangkan — angka
-            inilah yang dipakai membagi donasi ke penerima.
-          </p>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor={`items.${index}.ingredients`}>
-              Bahan yang digunakan
-            </Label>
-            <Textarea
-              id={`items.${index}.ingredients`}
-              rows={3}
-              placeholder="Contoh: ayam, tepung terigu, telur, minyak goreng"
-              {...register(`items.${index}.ingredients`)}
-            />
-            {errors.items?.[index]?.ingredients ? (
-              <p className="text-sm text-destructive">
-                {errors.items[index]?.ingredients?.message}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label>Alergen</Label>
-            <div className="flex flex-wrap gap-x-5 gap-y-2">
-              {BASE_ALLERGENS.map((allergen) => (
-                <label
-                  key={allergen}
-                  className="flex items-center gap-2 text-sm capitalize"
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field label="Jenis makanan" htmlFor={`items.${index}.foodType`}>
+                <select
+                  id={`items.${index}.foodType`}
+                  className={SELECT_CLASS}
+                  {...register(`items.${index}.foodType`)}
                 >
-                  <input
-                    type="checkbox"
-                    value={allergen}
-                    className="size-4 accent-brand"
-                    {...register(`items.${index}.allergens`)}
-                  />
-                  {allergen}
-                </label>
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Centang alergen yang terkandung. Penerima dengan pantangan ini
-              tidak akan dicocokkan dengan donasi tersebut.
-            </p>
-          </div>
+                  {FOOD_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {FOOD_TYPE_LABEL[type]}
+                    </option>
+                  ))}
+                </select>
+              </Field>
 
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              className="size-4 accent-brand"
-              {...register(`items.${index}.isHalal`)}
-            />
-            Makanan ini halal
-          </label>
-        </div>
+              <Field
+                label="Ketahanan (jam)"
+                htmlFor={`items.${index}.shelfLifeHours`}
+                error={errors.items?.[index]?.shelfLifeHours?.message}
+              >
+                <Input
+                  id={`items.${index}.shelfLifeHours`}
+                  type="number"
+                  min={1}
+                  max={168}
+                  {...register(`items.${index}.shelfLifeHours`, {
+                    valueAsNumber: true,
+                  })}
+                />
+              </Field>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-3">
+              <Field
+                label="Kuantitas"
+                htmlFor={`items.${index}.quantity`}
+                error={errors.items?.[index]?.quantity?.message}
+              >
+                <Input
+                  id={`items.${index}.quantity`}
+                  type="number"
+                  min={1}
+                  {...register(`items.${index}.quantity`, {
+                    valueAsNumber: true,
+                  })}
+                />
+              </Field>
+
+              <Field
+                label="Satuan"
+                htmlFor={`items.${index}.unit`}
+                error={errors.items?.[index]?.unit?.message}
+              >
+                <Input
+                  id={`items.${index}.unit`}
+                  {...register(`items.${index}.unit`)}
+                />
+              </Field>
+
+              <Field
+                label="Estimasi porsi"
+                htmlFor={`items.${index}.servings`}
+                error={errors.items?.[index]?.servings?.message}
+              >
+                <Input
+                  id={`items.${index}.servings`}
+                  type="number"
+                  min={1}
+                  {...register(`items.${index}.servings`, {
+                    valueAsNumber: true,
+                  })}
+                />
+              </Field>
+            </div>
+
+            <p className="rounded-lg bg-canvas px-3 py-2 text-sm text-brand-ink/55">
+              Kuantitas adalah cara makanan dikemas (2 tray, 5 box). Estimasi
+              porsi adalah berapa orang yang bisa dikenyangkan — angka inilah
+              yang dipakai membagi donasi ke penerima.
+            </p>
+
+            <Field
+              label="Bahan yang digunakan"
+              htmlFor={`items.${index}.ingredients`}
+              error={errors.items?.[index]?.ingredients?.message}
+            >
+              <Textarea
+                id={`items.${index}.ingredients`}
+                rows={3}
+                placeholder="Contoh: ayam, tepung terigu, telur, minyak goreng"
+                {...register(`items.${index}.ingredients`)}
+              />
+            </Field>
+
+            <Field
+              label="Alergen"
+              hint="Centang alergen yang terkandung. Penerima dengan pantangan ini tidak akan dicocokkan dengan donasi tersebut."
+            >
+              <div className="flex flex-wrap gap-x-5 gap-y-3">
+                {BASE_ALLERGENS.map((allergen) => (
+                  <label
+                    key={allergen}
+                    className="flex items-center gap-2 text-sm capitalize text-brand-ink/80"
+                  >
+                    <input
+                      type="checkbox"
+                      value={allergen}
+                      className="size-4 accent-brand"
+                      {...register(`items.${index}.allergens`)}
+                    />
+                    {allergen}
+                  </label>
+                ))}
+              </div>
+            </Field>
+
+            <Label className="flex items-center gap-2 text-sm font-normal text-brand-ink/80">
+              <input
+                type="checkbox"
+                className="size-4 accent-brand"
+                {...register(`items.${index}.isHalal`)}
+              />
+              Makanan ini halal
+            </Label>
+          </div>
+        </section>
       ))}
 
       <Button
         type="button"
         variant="outline"
         onClick={() => append(EMPTY_ITEM)}
-        className="w-full"
+        className="w-full border-dashed"
       >
         Tambah item makanan
       </Button>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="notes">Catatan untuk penerima</Label>
-        <Textarea
-          id="notes"
-          rows={2}
-          placeholder="Contoh: bisa diambil sebelum pukul 21.00"
-          {...register("notes")}
-        />
-        {errors.notes ? (
-          <p className="text-sm text-destructive">{errors.notes.message}</p>
-        ) : null}
-      </div>
+      <section className="rounded-xl border border-brand-ink/10 bg-white p-5">
+        <Field
+          label="Catatan untuk penerima"
+          htmlFor="notes"
+          error={errors.notes?.message}
+        >
+          <Textarea
+            id="notes"
+            rows={2}
+            placeholder="Contoh: bisa diambil sebelum pukul 21.00"
+            {...register("notes")}
+          />
+        </Field>
+      </section>
 
       <div
         className={cn(
-          "flex items-center justify-between rounded-lg border p-4",
-          totalServings > 0 && "border-brand",
+          "flex items-baseline justify-between gap-4 rounded-xl border px-5 py-4",
+          totalServings > 0
+            ? "border-brand bg-brand-tint/40"
+            : "border-brand-ink/10 bg-white",
         )}
       >
-        <span className="text-sm text-muted-foreground">Total porsi donasi</span>
-        <span className="text-lg font-semibold text-brand">
-          {totalServings} porsi
+        <span className="text-sm text-brand-ink/55">Total porsi donasi</span>
+        <span className="flex items-baseline gap-2">
+          <span className="numeric text-2xl font-semibold text-brand-ink">
+            {totalServings}
+          </span>
+          <span className="text-sm text-brand-ink/55">porsi</span>
         </span>
       </div>
 
       {errors.items?.root ? (
-        <p className="text-sm text-destructive">{errors.items.root.message}</p>
+        <p className="text-sm text-red-700">{errors.items.root.message}</p>
       ) : null}
 
-      <Button type="submit" disabled={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} size="lg">
         {isSubmitting ? "Menyimpan..." : "Simpan donasi"}
       </Button>
     </form>

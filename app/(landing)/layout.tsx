@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Logo } from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
+import { MONEY_DONATION_URL } from "@/lib/config";
 
 export default function LandingLayout({
   children,
@@ -77,9 +78,21 @@ export default function LandingLayout({
                 Donasi uang membantu biaya pengantaran dan verifikasi lembaga
                 penerima.
               </p>
-              <Button asChild variant="outline" size="sm" className="mt-3">
-                <Link href="/donasi-uang">Donasi uang</Link>
-              </Button>
+              {MONEY_DONATION_URL ? (
+                <Button asChild variant="outline" size="sm" className="mt-3">
+                  <a
+                    href={MONEY_DONATION_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Donasi uang
+                  </a>
+                </Button>
+              ) : (
+                <p className="mt-3 text-sm text-brand-ink/40">
+                  Kanal donasi sedang disiapkan.
+                </p>
+              )}
             </div>
           </div>
 
