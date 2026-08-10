@@ -1,5 +1,8 @@
+import { NOTIFICATION_TYPES } from "@/lib/config";
 import { getCurrentDonor } from "@/lib/db/donors";
+import type { NotificationDraft } from "@/lib/db/notifications";
 import { getCurrentRecipient } from "@/lib/db/recipients";
+import { notify, type WhatsAppDispatch } from "@/lib/notify";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   allocateAuto,
@@ -33,6 +36,7 @@ export type IncomingMatch = DonationMatch & {
 
 type DonationContext = {
   donorLocation: Coordinate;
+  donorName: string;
   donation: DonationProfile;
 };
 
@@ -71,8 +75,64 @@ async function loadDonationContext(
 
   return {
     donorLocation: { lat: Number(donor.lat), lng: Number(donor.lng) },
+    donorName: donor.name,
     donation: { totalServings, isHalal, allergens },
   };
+}
+
+async function announceNewMatches(
+  matches: Array<{
+    id: string;
+    recipient_id: string;
+    allocated_servings: number;
+  }>,
+  donorName: string,
+): Promise<void> {
+  if (matches.length === 0) {
+    return;
+  }
+
+  const admin = createAdminClient();
+
+  const { data: recipients } = await admin
+    .from("recipients")
+    .select("id, name, phone, profile_id")
+    .in(
+      "id",
+      matches.map((match) => match.recipient_id),
+    );
+
+  if (!recipients) {
+    return;
+  }
+
+  const byId = new Map(recipients.map((row) => [row.id, row]));
+  const drafts: NotificationDraft[] = [];
+  const dispatches: WhatsAppDispatch[] = [];
+
+  for (const match of matches) {
+    const recipient = byId.get(match.recipient_id);
+
+    if (!recipient) {
+      continue;
+    }
+
+    drafts.push({
+      profileId: recipient.profile_id,
+      title: "Ada donasi masuk",
+      body: `${donorName} mengirim ${match.allocated_servings} porsi. Buka dashboard untuk melihat rincian bahan dan alergen.`,
+      type: NOTIFICATION_TYPES.donationIncoming,
+      referenceId: match.id,
+    });
+
+    dispatches.push({
+      matchId: match.id,
+      targetPhone: recipient.phone,
+      message: `Halo ${recipient.name}, ada donasi ${match.allocated_servings} porsi dari ${donorName} lewat BagiRasa. Buka aplikasi untuk melihat rincian bahan dan alergen, lalu terima atau tolak donasi ini.`,
+    });
+  }
+
+  await notify(drafts, dispatches);
 }
 
 async function loadCandidates(): Promise<MatchCandidate[]> {
@@ -141,6 +201,39 @@ export async function listRecipientMatches(): Promise<IncomingMatch[]> {
   return data ?? [];
 }
 
+async function notifyDonorOfMatch(
+  donationId: string,
+  recipientName: string,
+  title: string,
+  body: string,
+  type: string,
+  referenceId: string,
+): Promise<void> {
+  const admin = createAdminClient();
+
+  const { data } = await admin
+    .from("food_donations")
+    .select("donors(profile_id)")
+    .eq("id", donationId)
+    .maybeSingle();
+
+  const profileId = data?.donors?.profile_id;
+
+  if (!profileId) {
+    return;
+  }
+
+  await notify([
+    {
+      profileId,
+      title,
+      body: `${recipientName} ${body}`,
+      type,
+      referenceId,
+    },
+  ]);
+}
+
 async function loadOwnedMatch(matchId: string) {
   const recipient = await getCurrentRecipient();
 
@@ -191,6 +284,19 @@ export async function respondToMatch(
   if (error) {
     return { ok: false, error: error.message };
   }
+
+  await notifyDonorOfMatch(
+    owned.match.donation_id,
+    owned.recipient.name,
+    accept ? "Donasi diterima" : "Donasi ditolak",
+    accept
+      ? `menerima ${owned.match.allocated_servings} porsi. Koordinasikan waktu penyerahan.`
+      : `menolak alokasi ${owned.match.allocated_servings} porsi.`,
+    accept
+      ? NOTIFICATION_TYPES.donationAccepted
+      : NOTIFICATION_TYPES.donationRejected,
+    matchId,
+  );
 
   return { ok: true };
 }
@@ -249,6 +355,15 @@ export async function confirmHandover(matchId: string): Promise<ActionResult> {
       .eq("id", owned.match.donation_id);
   }
 
+  await notifyDonorOfMatch(
+    owned.match.donation_id,
+    owned.recipient.name,
+    "Penyerahan selesai",
+    `sudah menerima ${owned.match.allocated_servings} porsi.`,
+    NOTIFICATION_TYPES.handoverCompleted,
+    matchId,
+  );
+
   return { ok: true };
 }
 
@@ -299,15 +414,18 @@ export async function commitMatches(
     };
   }
 
-  const { error: insertError } = await supabase.from("donation_matches").insert(
-    outcome.allocations.map((allocation) => ({
-      donation_id: donationId,
-      recipient_id: allocation.recipientId,
-      allocated_servings: allocation.allocatedServings,
-      distance_km: allocation.distanceKm,
-      match_score: allocation.matchScore,
-    })),
-  );
+  const { data: insertedMatches, error: insertError } = await supabase
+    .from("donation_matches")
+    .insert(
+      outcome.allocations.map((allocation) => ({
+        donation_id: donationId,
+        recipient_id: allocation.recipientId,
+        allocated_servings: allocation.allocatedServings,
+        distance_km: allocation.distanceKm,
+        match_score: allocation.matchScore,
+      })),
+    )
+    .select("id, recipient_id, allocated_servings");
 
   if (insertError) {
     return { ok: false, error: insertError.message };
@@ -324,6 +442,8 @@ export async function commitMatches(
   if (statusError) {
     return { ok: false, error: statusError.message };
   }
+
+  await announceNewMatches(insertedMatches ?? [], context.donorName);
 
   return { ok: true, data: outcome };
 }
