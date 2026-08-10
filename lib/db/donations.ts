@@ -1,4 +1,5 @@
 import { getCurrentDonor } from "@/lib/db/donors";
+import { getCurrentProfile } from "@/lib/db/profiles";
 import { createClient } from "@/lib/supabase/server";
 import type { DonationCreateInput } from "@/lib/validations/donation";
 import type { Database } from "@/types/database.types";
@@ -20,6 +21,16 @@ export async function createDonation(
     return {
       ok: false,
       error: "Lengkapi profil restoran dulu sebelum membuat donasi",
+    };
+  }
+
+  const profile = await getCurrentProfile();
+
+  if (profile?.verification_status !== "verified") {
+    return {
+      ok: false,
+      error:
+        "Akunmu belum diverifikasi admin. Donasi baru bisa dibuat setelah verifikasi selesai.",
     };
   }
 

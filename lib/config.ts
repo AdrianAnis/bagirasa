@@ -20,6 +20,7 @@ export const NOTIFICATION_TYPES = {
   donationRejected: "donation_rejected",
   handoverCompleted: "handover_completed",
   feedbackReceived: "feedback_received",
+  verificationUpdated: "verification_updated",
 } as const;
 
 export const AUTH_ROUTES = ["/login", "/register", "/choose-role"] as const;

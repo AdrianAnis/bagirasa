@@ -1,6 +1,7 @@
 import { NOTIFICATION_TYPES } from "@/lib/config";
 import { getCurrentDonor } from "@/lib/db/donors";
 import type { NotificationDraft } from "@/lib/db/notifications";
+import { getCurrentProfile } from "@/lib/db/profiles";
 import { getCurrentRecipient } from "@/lib/db/recipients";
 import { notify, type WhatsAppDispatch } from "@/lib/notify";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -376,6 +377,16 @@ export async function commitMatches(
 
   if (!context) {
     return { ok: false, error: "Donasi tidak ditemukan atau bukan milikmu" };
+  }
+
+  const profile = await getCurrentProfile();
+
+  if (profile?.verification_status !== "verified") {
+    return {
+      ok: false,
+      error:
+        "Akunmu belum diverifikasi admin. Donasi baru bisa disalurkan setelah verifikasi selesai.",
+    };
   }
 
   const supabase = await createClient();
