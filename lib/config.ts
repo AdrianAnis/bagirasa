@@ -12,6 +12,15 @@ export const MATCH_WEIGHTS = {
 
 export const MONEY_DONATION_URL = "";
 
+export const WA_RATE_LIMIT_PER_HOUR = 20;
+
+export const NOTIFICATION_TYPES = {
+  donationIncoming: "donation_incoming",
+  donationAccepted: "donation_accepted",
+  donationRejected: "donation_rejected",
+  handoverCompleted: "handover_completed",
+} as const;
+
 export const AUTH_ROUTES = ["/login", "/register", "/choose-role"] as const;
 
 export const ROLE_HOME = {

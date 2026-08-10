@@ -21,6 +21,8 @@ type AppNavProps = {
   roleLabel: string;
   organisationName: string | null;
   verificationStatus: string;
+  notificationsHref: string | null;
+  unreadCount: number;
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -35,6 +37,8 @@ export function AppNav({
   roleLabel,
   organisationName,
   verificationStatus,
+  notificationsHref,
+  unreadCount,
 }: AppNavProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -86,6 +90,42 @@ export function AppNav({
         </nav>
 
         <div className="ml-auto flex items-center gap-3">
+          {notificationsHref ? (
+            <Link
+              href={notificationsHref}
+              aria-label={
+                unreadCount > 0
+                  ? `Notifikasi, ${unreadCount} belum dibaca`
+                  : "Notifikasi"
+              }
+              className={cn(
+                "relative flex size-9 items-center justify-center rounded-md border transition-colors",
+                isActive(notificationsHref)
+                  ? "border-brand bg-brand-tint text-brand-deep"
+                  : "border-brand-ink/15 text-brand-ink/60 hover:text-brand-ink",
+              )}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-4"
+                aria-hidden
+              >
+                <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+              </svg>
+              {unreadCount > 0 ? (
+                <span className="numeric absolute -right-1.5 -top-1.5 flex min-w-5 items-center justify-center rounded-full bg-brand px-1 text-[11px] font-semibold leading-5 text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
+
           <div className="hidden text-right sm:block">
             <p className="text-sm font-medium text-brand-ink">
               {organisationName ?? roleLabel}
