@@ -14,6 +14,12 @@ export const MONEY_DONATION_URL = "";
 
 export const WA_RATE_LIMIT_PER_HOUR = 20;
 
+export const KG_PER_SERVING = 0.4;
+
+export const CO2E_KG_PER_FOOD_KG = 2.5;
+
+export const GEMINI_MODEL = "gemini-2.0-flash";
+
 export const NOTIFICATION_TYPES = {
   donationIncoming: "donation_incoming",
   donationAccepted: "donation_accepted",

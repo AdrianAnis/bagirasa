@@ -15,6 +15,7 @@ const NAV_LINKS: Record<string, NavLink[]> = {
   donor: [
     { href: "/donor", label: "Dashboard" },
     { href: "/donor/donations/new", label: "Buat donasi" },
+    { href: "/donor/analytics", label: "Analitik" },
     { href: "/donor/profile", label: "Profil restoran" },
   ],
   recipient: [

@@ -10,6 +10,8 @@
   --color-brand-ink: #10241c;
   --color-brand-tint: #e8f0ec;
   --color-canvas: #f7f8f7;
+  --color-chart: #0f8a57;
+  --color-chart-soft: #cfe8dc;
   --font-mono: var(--font-plex-mono);
   --text-display: 3.25rem;
   --text-display--line-height: 1.04;
