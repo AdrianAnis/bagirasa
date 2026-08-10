@@ -3,9 +3,11 @@ import Link from "next/link";
 import { DonationList } from "@/components/donation/DonationList";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { RatingStars } from "@/components/shared/RatingStars";
 import { Button } from "@/components/ui/button";
 import { listDonorDonations } from "@/lib/db/donations";
 import { getCurrentDonor } from "@/lib/db/donors";
+import { listDonorFeedback } from "@/lib/db/feedback";
 
 export default async function DonorDashboardPage() {
   const [donor, donations] = await Promise.all([
@@ -27,10 +29,14 @@ export default async function DonorDashboardPage() {
     (donation) => donation.status === "available",
   ).length;
 
+  const feedback = donor ? await listDonorFeedback(donor.id) : [];
+  const reputation = donor ? Number(donor.reputation_score) : 0;
+
   const stats = [
     { label: "Donasi dibuat", value: donations.length },
     { label: "Porsi tersalurkan", value: distributedServings },
     { label: "Menunggu disalurkan", value: pendingDonations },
+    { label: "Penilaian diterima", value: feedback.length },
   ];
 
   return (
@@ -57,7 +63,7 @@ export default async function DonorDashboardPage() {
       />
 
       {donor ? (
-        <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-3">
+        <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.label} className="bg-white px-5 py-6">
               <dt className="eyebrow text-brand-ink/40">{stat.label}</dt>
@@ -67,6 +73,41 @@ export default async function DonorDashboardPage() {
             </div>
           ))}
         </dl>
+      ) : null}
+
+      {donor && feedback.length > 0 ? (
+        <section className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-lg font-semibold text-brand-ink">
+              Reputasi restoran
+            </h2>
+            <div className="flex items-center gap-2">
+              <RatingStars value={reputation} size="md" />
+              <span className="numeric text-lg font-semibold text-brand-ink">
+                {reputation.toFixed(1)}
+              </span>
+              <span className="text-sm text-brand-ink/45">
+                dari {feedback.length} penilaian
+              </span>
+            </div>
+          </div>
+
+          <ul className="flex flex-col divide-y divide-brand-ink/8 rounded-xl border border-brand-ink/10 bg-white px-5">
+            {feedback.map((item) => (
+              <li key={item.id} className="flex flex-col gap-1.5 py-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <RatingStars value={item.rating} />
+                  <span className="text-sm font-medium text-brand-ink">
+                    {item.recipients?.name ?? "Penerima"}
+                  </span>
+                </div>
+                {item.comment ? (
+                  <p className="text-sm text-brand-ink/60">{item.comment}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
       ) : null}
 
       <section className="flex flex-col gap-4">
