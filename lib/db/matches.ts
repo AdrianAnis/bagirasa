@@ -32,6 +32,7 @@ export type IncomingMatch = DonationMatch & {
     donors: { name: string; address: string; phone: string } | null;
     food_items: Database["public"]["Tables"]["food_items"]["Row"][];
   } | null;
+  feedbacks: { rating: number; comment: string | null } | null;
 };
 
 type DonationContext = {
@@ -193,7 +194,7 @@ export async function listRecipientMatches(): Promise<IncomingMatch[]> {
   const { data } = await supabase
     .from("donation_matches")
     .select(
-      "*, food_donations(id, notes, created_at, donors(name, address, phone), food_items(*))",
+      "*, food_donations(id, notes, created_at, donors(name, address, phone), food_items(*)), feedbacks(rating, comment)",
     )
     .eq("recipient_id", recipient.id)
     .order("created_at", { ascending: false });

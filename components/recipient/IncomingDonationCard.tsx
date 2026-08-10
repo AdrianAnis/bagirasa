@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { FeedbackForm } from "@/components/recipient/FeedbackForm";
+import { RatingStars } from "@/components/shared/RatingStars";
 import { StatusBadge, type StatusTone } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import type { IncomingMatch } from "@/lib/db/matches";
@@ -42,6 +44,9 @@ export function IncomingDonationCard({ match }: IncomingDonationCardProps) {
   );
   const isHalal = items.every((item) => item.is_halal);
   const status = STATUS[match.status];
+  const feedback = match.feedbacks;
+  const donorName = donation?.donors?.name ?? "Restoran";
+  const canRate = match.status === "completed" && !feedback;
 
   async function runAction(action: "accept" | "reject" | "handover") {
     setPendingAction(action);
@@ -79,9 +84,7 @@ export function IncomingDonationCard({ match }: IncomingDonationCardProps) {
           <p className="eyebrow text-brand-ink/40">
             {donation ? formatDate(donation.created_at) : ""}
           </p>
-          <h3 className="mt-1 font-semibold text-brand-ink">
-            {donation?.donors?.name ?? "Restoran"}
-          </h3>
+          <h3 className="mt-1 font-semibold text-brand-ink">{donorName}</h3>
           <p className="numeric mt-1 text-sm text-brand-ink/50">
             {match.allocated_servings} porsi ·{" "}
             {Number(match.distance_km).toFixed(1)} km
@@ -148,6 +151,21 @@ export function IncomingDonationCard({ match }: IncomingDonationCardProps) {
           </p>
         ) : null}
       </div>
+
+      {feedback ? (
+        <footer className="flex flex-wrap items-center gap-3 border-t border-brand-ink/10 bg-canvas px-5 py-4">
+          <RatingStars value={feedback.rating} />
+          <span className="text-sm text-brand-ink/55">
+            {feedback.comment ? feedback.comment : "Sudah kamu nilai"}
+          </span>
+        </footer>
+      ) : null}
+
+      {canRate ? (
+        <footer className="border-t border-brand-ink/10 bg-canvas px-5 py-4">
+          <FeedbackForm matchId={match.id} donorName={donorName} />
+        </footer>
+      ) : null}
 
       {match.status === "pending" || match.status === "accepted" ? (
         <footer className="flex flex-wrap gap-3 border-t border-brand-ink/10 bg-canvas px-5 py-4">
