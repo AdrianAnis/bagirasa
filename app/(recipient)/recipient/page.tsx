@@ -3,13 +3,16 @@ import Link from "next/link";
 import { IncomingDonationCard } from "@/components/recipient/IncomingDonationCard";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
+import { VerificationNotice } from "@/components/shared/VerificationNotice";
 import { Button } from "@/components/ui/button";
 import { listRecipientMatches } from "@/lib/db/matches";
+import { getCurrentProfile } from "@/lib/db/profiles";
 import { getCurrentRecipient } from "@/lib/db/recipients";
 import { RECIPIENT_TYPE_LABEL } from "@/lib/validations/recipient";
 
 export default async function RecipientDashboardPage() {
-  const [recipient, matches] = await Promise.all([
+  const [profile, recipient, matches] = await Promise.all([
+    getCurrentProfile(),
     getCurrentRecipient(),
     listRecipientMatches(),
   ]);
@@ -51,6 +54,13 @@ export default async function RecipientDashboardPage() {
           </Button>
         }
       />
+
+      {profile ? (
+        <VerificationNotice
+          status={profile.verification_status}
+          role="recipient"
+        />
+      ) : null}
 
       {recipient ? (
         <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-4">

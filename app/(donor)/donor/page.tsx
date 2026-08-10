@@ -4,16 +4,21 @@ import { DonationList } from "@/components/donation/DonationList";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { RatingStars } from "@/components/shared/RatingStars";
+import { VerificationNotice } from "@/components/shared/VerificationNotice";
 import { Button } from "@/components/ui/button";
 import { listDonorDonations } from "@/lib/db/donations";
 import { getCurrentDonor } from "@/lib/db/donors";
 import { listDonorFeedback } from "@/lib/db/feedback";
+import { getCurrentProfile } from "@/lib/db/profiles";
 
 export default async function DonorDashboardPage() {
-  const [donor, donations] = await Promise.all([
+  const [profile, donor, donations] = await Promise.all([
+    getCurrentProfile(),
     getCurrentDonor(),
     listDonorDonations(),
   ]);
+
+  const isVerified = profile?.verification_status === "verified";
 
   const countServings = (donation: (typeof donations)[number]) =>
     donation.food_items.reduce((sum, item) => sum + item.servings, 0);
@@ -50,17 +55,26 @@ export default async function DonorDashboardPage() {
             : "Lengkapi profil restoran dulu. Donasi baru bisa dibuat setelah lokasi dan dokumen terisi."
         }
         actions={
-          donor ? (
+          donor && isVerified ? (
             <Button asChild>
               <Link href="/donor/donations/new">Buat donasi</Link>
             </Button>
           ) : (
             <Button asChild>
-              <Link href="/donor/profile">Lengkapi profil</Link>
+              <Link href="/donor/profile">
+                {donor ? "Ubah profil" : "Lengkapi profil"}
+              </Link>
             </Button>
           )
         }
       />
+
+      {profile ? (
+        <VerificationNotice
+          status={profile.verification_status}
+          role="donor"
+        />
+      ) : null}
 
       {donor ? (
         <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-2 lg:grid-cols-4">
@@ -116,14 +130,22 @@ export default async function DonorDashboardPage() {
           <EmptyState
             title="Belum ada donasi"
             description={
-              donor
-                ? "Catat sisa makanan hari ini, lalu salurkan ke panti terdekat yang membutuhkan."
-                : "Lengkapi profil restoran dulu sebelum membuat donasi pertama."
+              !donor
+                ? "Lengkapi profil restoran dulu sebelum membuat donasi pertama."
+                : isVerified
+                  ? "Catat sisa makanan hari ini, lalu salurkan ke panti terdekat yang membutuhkan."
+                  : "Donasi bisa dibuat setelah admin memverifikasi akunmu."
             }
             action={
               <Button asChild>
-                <Link href={donor ? "/donor/donations/new" : "/donor/profile"}>
-                  {donor ? "Buat donasi" : "Lengkapi profil"}
+                <Link
+                  href={
+                    donor && isVerified
+                      ? "/donor/donations/new"
+                      : "/donor/profile"
+                  }
+                >
+                  {donor && isVerified ? "Buat donasi" : "Lengkapi profil"}
                 </Link>
               </Button>
             }
