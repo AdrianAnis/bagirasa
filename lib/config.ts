@@ -10,6 +10,8 @@ export const MATCH_WEIGHTS = {
   fairness: 0.25,
 } as const;
 
+export const MONEY_DONATION_URL = "";
+
 export const AUTH_ROUTES = ["/login", "/register", "/choose-role"] as const;
 
 export const ROLE_HOME = {
