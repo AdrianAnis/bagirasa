@@ -4,78 +4,67 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export function RoleChooser() {
   const [showRecipientTypes, setShowRecipientTypes] = useState(false);
 
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-6">
+    <div className="flex w-full max-w-3xl flex-col">
       <div className="text-center">
-        <h1 className="text-2xl font-semibold text-brand">Daftar sebagai apa?</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Pilih peran yang sesuai. Peran menentukan menu dan data yang bisa kamu
-          akses.
+        <p className="eyebrow text-brand/70">Daftar</p>
+        <h1 className="mt-2 text-title font-semibold text-brand-ink">
+          Kamu bergabung sebagai apa?
+        </h1>
+        <p className="mt-2 text-sm text-brand-ink/55">
+          Peran menentukan menu dan data yang bisa kamu akses. Pilihan ini tidak
+          bisa diubah sendiri setelah akun dibuat.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Penyumbang</CardTitle>
-            <CardDescription>
-              Restoran, rumah makan, atau warteg yang ingin menyalurkan surplus
-              makanan.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild className="w-full">
-              <Link href="/register?role=donor">Pilih Penyumbang</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col rounded-xl border border-brand-ink/10 bg-white p-6">
+          <h2 className="font-semibold text-brand-ink">Penyumbang</h2>
+          <p className="mt-2 flex-1 text-sm leading-relaxed text-brand-ink/55">
+            Restoran, rumah makan, atau warteg yang ingin menyalurkan surplus
+            makanan layak konsumsi.
+          </p>
+          <Button asChild className="mt-6 w-full">
+            <Link href="/register?role=donor">Daftar sebagai penyumbang</Link>
+          </Button>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Penerima</CardTitle>
-            <CardDescription>
-              Panti asuhan atau rumah lansia yang menerima donasi makanan.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            {showRecipientTypes ? (
-              <>
-                <Button asChild variant="outline" className="w-full">
-                  <Link href="/register?role=recipient&type=panti_asuhan">
-                    Panti Asuhan
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="w-full">
-                  <Link href="/register?role=recipient&type=rumah_lansia">
-                    Rumah Lansia
-                  </Link>
-                </Button>
-              </>
-            ) : (
-              <Button
-                type="button"
-                className="w-full"
-                onClick={() => setShowRecipientTypes(true)}
-              >
-                Pilih Penerima
+        <div className="flex flex-col rounded-xl border border-brand-ink/10 bg-white p-6">
+          <h2 className="font-semibold text-brand-ink">Penerima</h2>
+          <p className="mt-2 flex-1 text-sm leading-relaxed text-brand-ink/55">
+            Panti asuhan atau rumah lansia yang menerima donasi makanan.
+          </p>
+
+          {showRecipientTypes ? (
+            <div className="mt-6 flex flex-col gap-3">
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/register?role=recipient&type=panti_asuhan">
+                  Panti Asuhan
+                </Link>
               </Button>
-            )}
-          </CardContent>
-        </Card>
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/register?role=recipient&type=rumah_lansia">
+                  Rumah Lansia
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              className="mt-6 w-full"
+              onClick={() => setShowRecipientTypes(true)}
+            >
+              Daftar sebagai penerima
+            </Button>
+          )}
+        </div>
       </div>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="mt-8 text-center text-sm text-brand-ink/55">
         Sudah punya akun?{" "}
         <Link href="/login" className="font-medium text-brand underline">
           Masuk

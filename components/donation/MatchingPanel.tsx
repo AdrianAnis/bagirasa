@@ -5,17 +5,27 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import type { MatchingOutcome } from "@/lib/matching";
+import { cn } from "@/lib/utils";
 
 type SelectionMode = "auto" | "manual";
+
+const MODES: Array<{
+  id: SelectionMode;
+  title: string;
+  body: string;
+}> = [
+  {
+    id: "auto",
+    title: "Otomatis",
+    body: "BagiRasa memilih penerima paling cocok dan membagi porsi sampai habis.",
+  },
+  {
+    id: "manual",
+    title: "Pilih sendiri",
+    body: "Kamu menentukan penerimanya. Daftar tetap tersaring halal dan alergen.",
+  },
+];
 
 type MatchingPanelProps = {
   donationId: string;
@@ -103,65 +113,102 @@ export function MatchingPanel({
 
   const allocated = outcome.allocatedServings;
   const remaining = outcome.remainingServings;
+  const allocatedPercent = totalServings > 0 ? allocated / totalServings : 0;
   const canSend = outcome.allocations.length > 0 && !isSending && !isLoading;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3">
-        <p className="text-sm font-medium">Mode penyaluran</p>
+    <div className="flex flex-col gap-8">
+      <section className="flex flex-col gap-3">
+        <p className="eyebrow text-brand-ink/40">Mode penyaluran</p>
         <div className="grid gap-3 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={() => switchMode("auto")}
-            className={cn(
-              "rounded-lg border p-4 text-left transition-colors",
-              mode === "auto" ? "border-brand bg-brand/5" : "hover:bg-muted",
-            )}
-          >
-            <span className="font-medium">Otomatis (disarankan)</span>
-            <span className="mt-1 block text-sm text-muted-foreground">
-              BagiRasa memilih penerima paling cocok dan membagi porsi secara
-              adil sampai habis.
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => switchMode("manual")}
-            className={cn(
-              "rounded-lg border p-4 text-left transition-colors",
-              mode === "manual" ? "border-brand bg-brand/5" : "hover:bg-muted",
-            )}
-          >
-            <span className="font-medium">Pilih sendiri</span>
-            <span className="mt-1 block text-sm text-muted-foreground">
-              Kamu menentukan penerimanya. Daftar tetap tersaring halal dan
-              alergen.
-            </span>
-          </button>
+          {MODES.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={mode === item.id}
+              onClick={() => switchMode(item.id)}
+              className={cn(
+                "rounded-xl border p-4 text-left transition-colors",
+                mode === item.id
+                  ? "border-brand bg-brand-tint/50"
+                  : "border-brand-ink/12 bg-white hover:border-brand-ink/25",
+              )}
+            >
+              <span className="font-semibold text-brand-ink">{item.title}</span>
+              <span className="mt-1 block text-sm leading-relaxed text-brand-ink/55">
+                {item.body}
+              </span>
+            </button>
+          ))}
         </div>
-      </div>
+      </section>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-4">
-        <span className="text-sm text-muted-foreground">
-          {allocated} dari {totalServings} porsi teralokasi
-        </span>
-        <span
-          className={cn(
-            "text-sm font-semibold",
-            remaining === 0 ? "text-brand" : "text-muted-foreground",
-          )}
-        >
-          {remaining === 0 ? "Tidak ada sisa" : `Sisa ${remaining} porsi`}
-        </span>
-      </div>
+      <section className="rounded-xl border border-brand-ink/10 bg-white p-5">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <p className="flex items-baseline gap-2">
+            <span className="numeric text-3xl font-semibold text-brand-ink">
+              {allocated}
+            </span>
+            <span className="numeric text-sm text-brand-ink/45">
+              / {totalServings} porsi
+            </span>
+          </p>
+          <span
+            className={cn(
+              "text-sm font-medium",
+              remaining === 0 ? "text-brand" : "text-brand-ink/50",
+            )}
+          >
+            {remaining === 0 ? "Tidak ada sisa" : `Sisa ${remaining} porsi`}
+          </span>
+        </div>
+
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-brand-ink/8">
+          <div
+            style={{ width: `${allocatedPercent * 100}%` }}
+            className="h-full rounded-full bg-brand transition-[width] duration-300"
+          />
+        </div>
+
+        {outcome.allocations.length > 0 ? (
+          <ul className="mt-4 flex flex-col divide-y divide-brand-ink/8">
+            {outcome.allocations.map((allocation) => (
+              <li
+                key={allocation.recipientId}
+                className="flex flex-wrap items-baseline justify-between gap-2 py-3"
+              >
+                <span className="text-sm font-medium text-brand-ink">
+                  {allocation.recipientName}
+                </span>
+                <span className="flex items-baseline gap-3">
+                  <span className="numeric text-xs text-brand-ink/40">
+                    {allocation.distanceKm.toFixed(1)} km
+                  </span>
+                  <span className="numeric text-sm font-semibold text-brand-deep">
+                    {allocation.allocatedServings} porsi
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-4 text-sm text-brand-ink/50">
+            {isLoading ? "Menghitung..." : "Belum ada penerima terpilih."}
+          </p>
+        )}
+      </section>
 
       {mode === "manual" ? (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm font-medium">
-            Penerima yang bisa dipilih
-            {remaining === 0 ? " (porsi sudah habis)" : ""}
-          </p>
+        <section className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <p className="eyebrow text-brand-ink/40">Penerima yang cocok</p>
+            {remaining === 0 ? (
+              <span className="text-sm text-brand">
+                Porsi habis — pilihan lain terkunci
+              </span>
+            ) : null}
+          </div>
+
           {outcome.eligible.map((scored) => {
             const isSelected = selectedIds.includes(scored.candidate.id);
             const isLocked = remaining === 0 && !isSelected;
@@ -170,79 +217,59 @@ export function MatchingPanel({
               <button
                 key={scored.candidate.id}
                 type="button"
+                aria-pressed={isSelected}
                 disabled={isLocked}
                 onClick={() => toggleRecipient(scored.candidate.id)}
                 className={cn(
-                  "flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-left transition-colors",
-                  isSelected && "border-brand bg-brand/5",
-                  isLocked && "cursor-not-allowed opacity-50",
+                  "flex flex-wrap items-center justify-between gap-2 rounded-xl border p-4 text-left transition-colors",
+                  isSelected
+                    ? "border-brand bg-brand-tint/50"
+                    : "border-brand-ink/12 bg-white hover:border-brand-ink/25",
+                  isLocked && "cursor-not-allowed opacity-45 hover:border-brand-ink/12",
                 )}
               >
-                <span className="font-medium">{scored.candidate.name}</span>
-                <span className="text-sm text-muted-foreground">
+                <span className="font-medium text-brand-ink">
+                  {scored.candidate.name}
+                </span>
+                <span className="numeric text-sm text-brand-ink/50">
                   {scored.distanceKm.toFixed(1)} km · butuh{" "}
                   {scored.candidate.currentNeed} porsi
                 </span>
               </button>
             );
           })}
-        </div>
+        </section>
       ) : null}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Rencana penyaluran</CardTitle>
-          <CardDescription>
-            {isLoading
-              ? "Menghitung..."
-              : outcome.allocations.length
-                ? `${outcome.allocations.length} penerima akan menerima donasi ini.`
-                : "Belum ada penerima terpilih."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2">
-          {outcome.allocations.map((allocation) => (
-            <div
-              key={allocation.recipientId}
-              className="flex flex-wrap items-center justify-between gap-2 text-sm"
-            >
-              <span className="font-medium">{allocation.recipientName}</span>
-              <span className="text-muted-foreground">
-                {allocation.allocatedServings} porsi ·{" "}
-                {allocation.distanceKm.toFixed(1)} km
-              </span>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
       {outcome.rejected.length > 0 ? (
-        <details className="rounded-lg border p-4">
-          <summary className="cursor-pointer text-sm font-medium">
+        <details className="rounded-xl border border-brand-ink/10 bg-white px-5 py-4">
+          <summary className="cursor-pointer text-sm font-medium text-brand-ink">
             {outcome.rejected.length} penerima tersaring
           </summary>
-          <div className="mt-3 flex flex-col gap-2">
+          <ul className="mt-3 flex flex-col divide-y divide-brand-ink/8">
             {outcome.rejected.map((item) => (
-              <div
+              <li
                 key={item.candidate.id}
-                className="flex flex-wrap items-center justify-between gap-2 text-sm"
+                className="flex flex-wrap items-baseline justify-between gap-2 py-2.5"
               >
-                <span>{item.candidate.name}</span>
-                <span className="text-muted-foreground">{item.reason}</span>
-              </div>
+                <span className="text-sm text-brand-ink/70">
+                  {item.candidate.name}
+                </span>
+                <span className="text-sm text-brand-ink/45">{item.reason}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </details>
       ) : null}
 
       {remaining > 0 && outcome.allocations.length > 0 ? (
-        <p className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm">
+        <p className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           {remaining} porsi belum ada penerimanya. Donasi tetap bisa dikirim,
           tetapi sisa porsi berisiko terbuang.
         </p>
       ) : null}
 
-      <Button onClick={onSend} disabled={!canSend}>
+      <Button onClick={onSend} disabled={!canSend} size="lg">
         {isSending ? "Mengirim..." : "Kirim donasi"}
       </Button>
     </div>

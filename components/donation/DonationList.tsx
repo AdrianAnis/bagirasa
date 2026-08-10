@@ -1,22 +1,19 @@
 import Link from "next/link";
 
+import { StatusBadge, type StatusTone } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import type { DonationWithItems } from "@/lib/db/donations";
 import { FOOD_TYPE_LABEL, type FoodType } from "@/lib/validations/donation";
 
-const STATUS_LABEL: Record<DonationWithItems["status"], string> = {
-  draft: "Draf",
-  available: "Menunggu penyaluran",
-  matched: "Sudah dicocokkan",
-  completed: "Selesai",
-  cancelled: "Dibatalkan",
+const STATUS: Record<
+  DonationWithItems["status"],
+  { label: string; tone: StatusTone }
+> = {
+  draft: { label: "Draf", tone: "neutral" },
+  available: { label: "Belum disalurkan", tone: "waiting" },
+  matched: { label: "Sudah dicocokkan", tone: "active" },
+  completed: { label: "Selesai", tone: "done" },
+  cancelled: { label: "Dibatalkan", tone: "neutral" },
 };
 
 function formatDate(value: string): string {
@@ -32,14 +29,6 @@ type DonationListProps = {
 };
 
 export function DonationList({ donations }: DonationListProps) {
-  if (donations.length === 0) {
-    return (
-      <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-        Belum ada donasi. Donasi yang kamu buat akan muncul di sini.
-      </p>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-4">
       {donations.map((donation) => {
@@ -47,45 +36,74 @@ export function DonationList({ donations }: DonationListProps) {
           (total, item) => total + item.servings,
           0,
         );
+        const allergens = Array.from(
+          new Set(donation.food_items.flatMap((item) => item.allergens)),
+        );
+        const status = STATUS[donation.status];
 
         return (
-          <Card key={donation.id}>
-            <CardHeader>
-              <CardTitle className="text-base">
-                {donation.food_items.length} item — {totalServings} porsi
-              </CardTitle>
-              <CardDescription>
-                {formatDate(donation.created_at)} ·{" "}
-                {STATUS_LABEL[donation.status]}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-              {donation.food_items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex flex-wrap items-center justify-between gap-2 text-sm"
-                >
-                  <span className="font-medium">{item.name}</span>
-                  <span className="text-muted-foreground">
-                    {FOOD_TYPE_LABEL[item.food_type as FoodType]} · jumlah{" "}
-                    {item.quantity} {item.unit} · estimasi {item.servings} porsi
-                    {item.is_halal ? " · halal" : " · non-halal"}
-                    {item.allergens.length > 0
-                      ? ` · alergen: ${item.allergens.join(", ")}`
-                      : ""}
+          <article
+            key={donation.id}
+            className="overflow-hidden rounded-xl border border-brand-ink/10 bg-white"
+          >
+            <header className="flex flex-wrap items-start justify-between gap-4 border-b border-brand-ink/10 px-5 py-4">
+              <div>
+                <p className="eyebrow text-brand-ink/40">
+                  {formatDate(donation.created_at)}
+                </p>
+                <p className="mt-1 flex items-baseline gap-2">
+                  <span className="numeric text-2xl font-semibold text-brand-ink">
+                    {totalServings}
                   </span>
-                </div>
-              ))}
+                  <span className="text-sm text-brand-ink/55">
+                    porsi · {donation.food_items.length} item
+                  </span>
+                </p>
+              </div>
+              <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+            </header>
 
-              {donation.status === "available" ? (
-                <Button asChild size="sm" className="mt-2 self-start">
-                  <Link href={`/donor/donations/${donation.id}`}>
-                    Salurkan donasi
-                  </Link>
-                </Button>
-              ) : null}
-            </CardContent>
-          </Card>
+            <ul className="flex flex-col divide-y divide-brand-ink/8 px-5">
+              {donation.food_items.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex flex-wrap items-baseline justify-between gap-2 py-3"
+                >
+                  <span className="font-medium text-brand-ink">
+                    {item.name}
+                  </span>
+                  <span className="text-sm text-brand-ink/50">
+                    {FOOD_TYPE_LABEL[item.food_type as FoodType]} ·{" "}
+                    <span className="numeric">
+                      {item.quantity} {item.unit}
+                    </span>{" "}
+                    ·{" "}
+                    <span className="numeric">{item.servings} porsi</span>
+                    {item.is_halal ? "" : " · non-halal"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            {allergens.length > 0 || donation.status === "available" ? (
+              <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-brand-ink/10 bg-canvas px-5 py-4">
+                {allergens.length > 0 ? (
+                  <span className="text-sm text-brand-ink/55">
+                    Alergen: {allergens.join(", ")}
+                  </span>
+                ) : (
+                  <span />
+                )}
+                {donation.status === "available" ? (
+                  <Button asChild size="sm">
+                    <Link href={`/donor/donations/${donation.id}`}>
+                      Salurkan donasi
+                    </Link>
+                  </Button>
+                ) : null}
+              </footer>
+            ) : null}
+          </article>
         );
       })}
     </div>
