@@ -21,7 +21,7 @@ Ringkasan teknologi yang dipakai beserta alasannya, selaras dengan tema lomba *N
 | Form | React Hook Form |
 | Charts | Recharts |
 | Peta | Leaflet + react-leaflet (OpenStreetMap) |
-| AI | Google Gemini API (`@google/generative-ai`) |
+| AI | Google Gemini API (REST langsung, tanpa SDK) |
 | WhatsApp Gateway | Fonnte |
 | Toast/Notif UI | sonner |
 | Deployment | Vercel |
@@ -67,7 +67,9 @@ Token warna & tipografi didefinisikan sekali di config Tailwind dan dipakai kons
 
 ### AI — Google Gemini API
 - Dipakai untuk **insight analitik food waste** dan **ekstraksi alergen** (lihat PRD bagian 11).
-- Selalu dipanggil server-side, output dipaksa JSON agar mudah di-parse.
+- Selalu dipanggil server-side, output dipaksa JSON lewat `responseSchema` agar mudah di-parse.
+- **Dipanggil lewat REST langsung dengan `fetch`, tanpa SDK.** Paket `@google/generative-ai` sudah digantikan `@google/genai`, dan satu panggilan HTTP lebih ringan daripada dependency yang versinya masih bergerak. Pola yang sama dipakai untuk Fonnte.
+- Nama model disimpan di `lib/config.ts` (`GEMINI_MODEL`) supaya mudah diganti tanpa menyentuh logika.
 
 ### WhatsApp — Fonnte
 - Gateway untuk notifikasi donasi ke penerima (Fitur 1).
@@ -101,6 +103,9 @@ GEMINI_API_KEY=
 
 # Fonnte (server-only)
 FONNTE_API_TOKEN=
+
+# Cron (server-only)
+CRON_SECRET=
 ```
 
 Aturan:
@@ -119,7 +124,6 @@ Aturan:
     "react-dom": "^19",
     "@supabase/supabase-js": "latest",
     "@supabase/ssr": "latest",
-    "@google/generative-ai": "latest",
     "zod": "latest",
     "react-hook-form": "latest",
     "@hookform/resolvers": "latest",

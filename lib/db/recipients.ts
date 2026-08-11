@@ -44,7 +44,6 @@ export async function saveRecipientProfile(
   const existing = await getCurrentRecipient();
 
   const fields = {
-    type: payload.type,
     name: payload.name,
     address: payload.address,
     lat: payload.lat,
@@ -74,7 +73,7 @@ export async function saveRecipientProfile(
 
   const { data, error } = await supabase
     .from("recipients")
-    .insert({ profile_id: user.id, ...fields })
+    .insert({ profile_id: user.id, type: payload.type, ...fields })
     .select()
     .single();
 
