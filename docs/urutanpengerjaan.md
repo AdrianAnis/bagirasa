@@ -42,9 +42,10 @@ Ikuti `setup.md` dari awal sampai akhir.
 - [ ] Design system (Poppins + warna `brand`) aktif
 - [ ] `lib/config.ts` dibuat
 - [ ] Git init + commit + push
-- [ ] **Deploy kosong ke Vercel** (aktifkan continuous deploy dari awal)
 
-**DoD:** halaman skeleton tampil di localhost **dan** di URL Vercel, tanpa error.
+**DoD:** halaman skeleton tampil di localhost tanpa error.
+
+> Deploy Vercel dipindah ke Fase 10. Rencana awal mengaktifkan continuous deploy sejak Fase 0, tetapi seluruh pengembangan berjalan lokal dan penundaan ini tidak menghambat fase mana pun.
 
 ---
 
@@ -197,7 +198,11 @@ Ikuti `setup.md` dari awal sampai akhir.
 
 **Tujuan:** produksi stabil & aman.
 
+- [ ] **Upgrade Node ke 22 LTS** — Supabase `v2.112+` tidak mendukung Node 20, dan Vercel memakai Node 22
+- [ ] **Hubungkan repo ke Vercel** (dipindah dari Fase 0)
 - [ ] Set semua environment variable di Vercel (production)
+- [ ] Isi `GEMINI_API_KEY`, `FONNTE_API_TOKEN`, dan `CRON_SECRET`
+- [ ] Pasang jadwal cron harian ke `/api/cron` untuk membatalkan donasi kedaluwarsa
 - [ ] Pastikan secret hanya di server (tidak ada key bocor ke client)
 - [ ] Cek RLS aktif di project Supabase produksi
 - [ ] Uji alur end-to-end di URL produksi (daftar → donasi → match → terima → rating)
