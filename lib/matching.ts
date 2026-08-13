@@ -65,6 +65,53 @@ export type MatchingOutcome = {
   remainingServings: number;
 };
 
+export function expiresAt(
+  createdAt: string,
+  shelfLifeHours: number[],
+): Date | null {
+  if (shelfLifeHours.length === 0) {
+    return null;
+  }
+
+  const shortest = Math.min(...shelfLifeHours);
+  return new Date(new Date(createdAt).getTime() + shortest * 60 * 60 * 1000);
+}
+
+export function isExpired(deadline: Date | null, now: Date = new Date()): boolean {
+  return deadline !== null && deadline.getTime() <= now.getTime();
+}
+
+export function formatRemaining(
+  deadline: Date | null,
+  now: Date = new Date(),
+): string | null {
+  if (deadline === null) {
+    return null;
+  }
+
+  const minutes = Math.floor((deadline.getTime() - now.getTime()) / 60000);
+
+  if (minutes <= 0) {
+    return null;
+  }
+
+  if (minutes < 60) {
+    return `${minutes} menit`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const restMinutes = minutes % 60;
+
+  if (hours < 24) {
+    return restMinutes > 0 ? `${hours} jam ${restMinutes} menit` : `${hours} jam`;
+  }
+
+  const days = Math.floor(hours / 24);
+  const restHours = hours % 24;
+
+  return restHours > 0 ? `${days} hari ${restHours} jam` : `${days} hari`;
+}
+
 function toRadians(degrees: number): number {
   return (degrees * Math.PI) / 180;
 }

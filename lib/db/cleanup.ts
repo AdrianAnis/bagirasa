@@ -1,23 +1,12 @@
 import "server-only";
 
+import { expiresAt, isExpired } from "@/lib/matching";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type CleanupResult = {
   checked: number;
   cancelled: number;
 };
-
-export function expiresAt(
-  createdAt: string,
-  shelfLifeHours: number[],
-): Date | null {
-  if (shelfLifeHours.length === 0) {
-    return null;
-  }
-
-  const shortest = Math.min(...shelfLifeHours);
-  return new Date(new Date(createdAt).getTime() + shortest * 60 * 60 * 1000);
-}
 
 export async function cancelExpiredDonations(): Promise<CleanupResult> {
   const admin = createAdminClient();
@@ -28,17 +17,18 @@ export async function cancelExpiredDonations(): Promise<CleanupResult> {
     .eq("status", "available");
 
   const rows = data ?? [];
-  const now = Date.now();
+  const now = new Date();
 
   const expiredIds = rows
-    .filter((row) => {
-      const deadline = expiresAt(
-        row.created_at,
-        row.food_items.map((item) => item.shelf_life_hours),
-      );
-
-      return deadline !== null && deadline.getTime() < now;
-    })
+    .filter((row) =>
+      isExpired(
+        expiresAt(
+          row.created_at,
+          row.food_items.map((item) => item.shelf_life_hours),
+        ),
+        now,
+      ),
+    )
     .map((row) => row.id);
 
   if (expiredIds.length === 0) {

@@ -8,6 +8,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import {
   allocateAuto,
   allocateManual,
+  expiresAt,
+  isExpired,
   type Coordinate,
   type DonationProfile,
   type MatchCandidate,
@@ -40,6 +42,7 @@ type DonationContext = {
   donorLocation: Coordinate;
   donorName: string;
   donation: DonationProfile;
+  deadline: Date | null;
 };
 
 async function loadDonationContext(
@@ -55,7 +58,9 @@ async function loadDonationContext(
 
   const { data } = await supabase
     .from("food_donations")
-    .select("id, donor_id, food_items(servings, is_halal, allergens)")
+    .select(
+      "id, donor_id, created_at, food_items(servings, is_halal, allergens, shelf_life_hours)",
+    )
     .eq("id", donationId)
     .eq("donor_id", donor.id)
     .single();
@@ -79,6 +84,10 @@ async function loadDonationContext(
     donorLocation: { lat: Number(donor.lat), lng: Number(donor.lng) },
     donorName: donor.name,
     donation: { totalServings, isHalal, allergens },
+    deadline: expiresAt(
+      data.created_at,
+      data.food_items.map((item) => item.shelf_life_hours),
+    ),
   };
 }
 
@@ -386,6 +395,14 @@ export async function commitMatches(
       ok: false,
       error:
         "Akunmu belum diverifikasi admin. Donasi baru bisa disalurkan setelah verifikasi selesai.",
+    };
+  }
+
+  if (isExpired(context.deadline)) {
+    return {
+      ok: false,
+      error:
+        "Donasi ini sudah melewati batas ketahanan makanan dan tidak boleh disalurkan.",
     };
   }
 

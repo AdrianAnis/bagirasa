@@ -3,6 +3,7 @@ import Link from "next/link";
 import { StatusBadge, type StatusTone } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import type { DonationWithItems } from "@/lib/db/donations";
+import { expiresAt, formatRemaining, isExpired } from "@/lib/matching";
 import { FOOD_TYPE_LABEL, type FoodType } from "@/lib/validations/donation";
 
 const STATUS: Record<
@@ -39,7 +40,22 @@ export function DonationList({ donations }: DonationListProps) {
         const allergens = Array.from(
           new Set(donation.food_items.flatMap((item) => item.allergens)),
         );
-        const status = STATUS[donation.status];
+        const deadline = expiresAt(
+          donation.created_at,
+          donation.food_items.map((item) => item.shelf_life_hours),
+        );
+        const isPending = donation.status === "available";
+        const expired = isPending && isExpired(deadline);
+        const remaining = isPending ? formatRemaining(deadline) : null;
+        const status = expired
+          ? { label: "Kedaluwarsa", tone: "danger" as const }
+          : STATUS[donation.status];
+
+        const notes = [
+          allergens.length > 0 ? `Alergen: ${allergens.join(", ")}` : null,
+          remaining ? `sisa ketahanan ${remaining}` : null,
+          expired ? "Batas ketahanan makanan sudah terlewat" : null,
+        ].filter(Boolean);
 
         return (
           <article
@@ -85,16 +101,12 @@ export function DonationList({ donations }: DonationListProps) {
               ))}
             </ul>
 
-            {allergens.length > 0 || donation.status === "available" ? (
+            {notes.length > 0 || isPending ? (
               <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-brand-ink/10 bg-canvas px-5 py-4">
-                {allergens.length > 0 ? (
-                  <span className="text-sm text-brand-ink/55">
-                    Alergen: {allergens.join(", ")}
-                  </span>
-                ) : (
-                  <span />
-                )}
-                {donation.status === "available" ? (
+                <span className="text-sm text-brand-ink/55">
+                  {notes.join(" · ")}
+                </span>
+                {isPending && !expired ? (
                   <Button asChild size="sm">
                     <Link href={`/donor/donations/${donation.id}`}>
                       Salurkan donasi
