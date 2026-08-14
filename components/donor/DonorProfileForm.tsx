@@ -97,34 +97,38 @@ export function DonorProfileForm({ userId, donor }: DonorProfileFormProps) {
         </Field>
 
         <Field
-          label="Alamat lengkap"
-          htmlFor="address"
-          error={errors.address?.message}
-        >
-          <Input id="address" {...register("address")} />
-        </Field>
-
-        <Field
           label="Nomor telepon"
           htmlFor="phone"
           error={errors.phone?.message}
         >
           <Input id="phone" inputMode="numeric" {...register("phone")} />
         </Field>
-      </FormSection>
 
-      <FormSection
-        title="Titik lokasi"
-        description="Jarak dari titik ini ke lembaga penerima menentukan urutan rekomendasi."
-      >
-        <LocationPicker
-          value={position}
-          onChange={(next) => {
-            setValue("lat", next.lat, { shouldValidate: true });
-            setValue("lng", next.lng, { shouldValidate: true });
-          }}
+        <Field
+          label="Lokasi restoran"
+          hint="Geser pin bila lokasimu berubah. Alamatnya ikut diperbarui."
           error={errors.lat?.message ?? errors.lng?.message}
-        />
+        >
+          <LocationPicker
+            value={position}
+            onChange={(next) => {
+              setValue("lat", next.lat, { shouldValidate: true });
+              setValue("lng", next.lng, { shouldValidate: true });
+            }}
+            onAddressResolved={(address) =>
+              setValue("address", address, { shouldValidate: true })
+            }
+          />
+        </Field>
+
+        <Field
+          label="Alamat"
+          htmlFor="address"
+          hint="Terisi otomatis dari pin. Tambahkan nomor bangunan atau patokan bila perlu."
+          error={errors.address?.message}
+        >
+          <Input id="address" {...register("address")} />
+        </Field>
       </FormSection>
 
       <FormSection

@@ -2,14 +2,15 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
+import { ChipGroup } from "@/components/shared/ChipGroup";
 import { Field, FormSection } from "@/components/shared/Field";
 import { LocationPicker } from "@/components/shared/LocationPicker";
+import { SwitchField } from "@/components/shared/SwitchField";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { BASE_ALLERGENS } from "@/lib/config";
 import type { Recipient } from "@/lib/db/recipients";
 import { uploadIdentityDocument } from "@/lib/supabase/storage";
@@ -130,19 +131,37 @@ export function RecipientProfileForm({
         </Field>
 
         <Field
-          label="Alamat lengkap"
-          htmlFor="address"
-          error={errors.address?.message}
-        >
-          <Input id="address" {...register("address")} />
-        </Field>
-
-        <Field
           label="Nomor telepon pengurus"
           htmlFor="phone"
           error={errors.phone?.message}
         >
           <Input id="phone" inputMode="numeric" {...register("phone")} />
+        </Field>
+
+        <Field
+          label="Lokasi lembaga"
+          hint="Geser pin bila lokasimu berubah. Alamatnya ikut diperbarui."
+          error={errors.lat?.message ?? errors.lng?.message}
+        >
+          <LocationPicker
+            value={position}
+            onChange={(next) => {
+              setValue("lat", next.lat, { shouldValidate: true });
+              setValue("lng", next.lng, { shouldValidate: true });
+            }}
+            onAddressResolved={(address) =>
+              setValue("address", address, { shouldValidate: true })
+            }
+          />
+        </Field>
+
+        <Field
+          label="Alamat"
+          htmlFor="address"
+          hint="Terisi otomatis dari pin. Tambahkan nomor bangunan atau patokan bila perlu."
+          error={errors.address?.message}
+        >
+          <Input id="address" {...register("address")} />
         </Field>
       </FormSection>
 
@@ -180,50 +199,37 @@ export function RecipientProfileForm({
       </FormSection>
 
       <FormSection
-        title="Titik lokasi"
-        description="Dipakai menghitung jarak ke restoran penyumbang."
-      >
-        <LocationPicker
-          value={position}
-          onChange={(next) => {
-            setValue("lat", next.lat, { shouldValidate: true });
-            setValue("lng", next.lng, { shouldValidate: true });
-          }}
-          error={errors.lat?.message ?? errors.lng?.message}
-        />
-      </FormSection>
-
-      <FormSection
         title="Keamanan pangan"
         description="Dipakai sebagai penyaring wajib. Donasi yang bertentangan tidak akan pernah dikirimkan kepadamu."
       >
         <Field label="Pantangan alergen">
-          <div className="flex flex-wrap gap-x-5 gap-y-3">
-            {BASE_ALLERGENS.map((allergen) => (
-              <label
-                key={allergen}
-                className="flex items-center gap-2 text-sm capitalize text-brand-ink/80"
-              >
-                <input
-                  type="checkbox"
-                  value={allergen}
-                  className="size-4 accent-brand"
-                  {...register("allergenRestrictions")}
-                />
-                {allergen}
-              </label>
-            ))}
-          </div>
+          <Controller
+            control={control}
+            name="allergenRestrictions"
+            render={({ field }) => (
+              <ChipGroup
+                label="Pantangan alergen"
+                options={BASE_ALLERGENS}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
         </Field>
 
-        <Label className="flex items-center gap-2 text-sm font-normal text-brand-ink/80">
-          <input
-            type="checkbox"
-            className="size-4 accent-brand"
-            {...register("halalOnly")}
-          />
-          Hanya menerima makanan halal
-        </Label>
+        <Controller
+          control={control}
+          name="halalOnly"
+          render={({ field }) => (
+            <SwitchField
+              id="halalOnly"
+              label="Hanya menerima makanan halal"
+              description="Donasi non-halal tidak akan dicocokkan denganmu."
+              checked={field.value}
+              onCheckedChange={field.onChange}
+            />
+          )}
+        />
       </FormSection>
 
       <FormSection

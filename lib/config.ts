@@ -37,6 +37,13 @@ export const ROLE_HOME = {
   admin: "/admin",
 } as const;
 
+export const VERIFICATION_ROUTE = "/verifikasi";
+
+export const PROFILE_ROUTE = {
+  donor: "/donor/profile",
+  recipient: "/recipient/profile",
+} as const;
+
 export const BASE_ALLERGENS = [
   "kacang",
   "susu",
