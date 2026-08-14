@@ -44,6 +44,23 @@ export default async function RecipientDashboardPage() {
         }
       />
 
+      {recipient && recipient.current_need <= 0 ? (
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4">
+          <div>
+            <p className="font-medium text-amber-900">
+              Belum menerima donasi masuk
+            </p>
+            <p className="mt-1 text-sm text-amber-900/70">
+              Kebutuhan porsimu masih 0, jadi lembagamu belum ikut dicocokkan.
+              Isi berapa porsi yang kamu butuhkan hari ini.
+            </p>
+          </div>
+          <Button asChild>
+            <Link href="/recipient/profile">Atur kebutuhan porsi</Link>
+          </Button>
+        </div>
+      ) : null}
+
       <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <div key={stat.label} className="bg-white px-5 py-6">

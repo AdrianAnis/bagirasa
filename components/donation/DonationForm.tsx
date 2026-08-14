@@ -2,13 +2,19 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  useWatch,
+} from "react-hook-form";
 import { toast } from "sonner";
 
+import { ChipGroup } from "@/components/shared/ChipGroup";
 import { Field } from "@/components/shared/Field";
+import { SwitchField } from "@/components/shared/SwitchField";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BASE_ALLERGENS } from "@/lib/config";
 import { cn } from "@/lib/utils";
@@ -205,34 +211,35 @@ export function DonationForm() {
 
             <Field
               label="Alergen"
-              hint="Centang alergen yang terkandung. Penerima dengan pantangan ini tidak akan dicocokkan dengan donasi tersebut."
+              hint="Pilih alergen yang terkandung. Penerima dengan pantangan ini tidak akan dicocokkan dengan donasi tersebut."
             >
-              <div className="flex flex-wrap gap-x-5 gap-y-3">
-                {BASE_ALLERGENS.map((allergen) => (
-                  <label
-                    key={allergen}
-                    className="flex items-center gap-2 text-sm capitalize text-brand-ink/80"
-                  >
-                    <input
-                      type="checkbox"
-                      value={allergen}
-                      className="size-4 accent-brand"
-                      {...register(`items.${index}.allergens`)}
-                    />
-                    {allergen}
-                  </label>
-                ))}
-              </div>
+              <Controller
+                control={control}
+                name={`items.${index}.allergens`}
+                render={({ field }) => (
+                  <ChipGroup
+                    label="Alergen"
+                    options={BASE_ALLERGENS}
+                    value={field.value as (typeof BASE_ALLERGENS)[number][]}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
             </Field>
 
-            <Label className="flex items-center gap-2 text-sm font-normal text-brand-ink/80">
-              <input
-                type="checkbox"
-                className="size-4 accent-brand"
-                {...register(`items.${index}.isHalal`)}
-              />
-              Makanan ini halal
-            </Label>
+            <Controller
+              control={control}
+              name={`items.${index}.isHalal`}
+              render={({ field }) => (
+                <SwitchField
+                  id={`items.${index}.isHalal`}
+                  label="Makanan ini halal"
+                  description="Matikan bila mengandung bahan non-halal."
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
           </div>
         </section>
       ))}

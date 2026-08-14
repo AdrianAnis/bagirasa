@@ -125,7 +125,7 @@ export async function registerRecipient(
     lng: input.lng,
     phone: input.phone,
     capacity: input.capacity,
-    currentNeed: input.currentNeed,
+    currentNeed: 0,
     allergenRestrictions: input.allergenRestrictions,
     halalOnly: input.halalOnly,
     legalDocUrl: upload.path,

@@ -6,8 +6,10 @@ import { useForm, useWatch, type FieldPath } from "react-hook-form";
 import { toast } from "sonner";
 
 import {
-  PendingVerificationDialog,
-} from "@/components/auth/PendingVerificationDialog";
+  ConfirmRegistrationDialog,
+  type SummaryRow,
+} from "@/components/auth/ConfirmRegistrationDialog";
+import { PendingVerificationDialog } from "@/components/auth/PendingVerificationDialog";
 import {
   RegisterStepper,
   type RegisterStep,
@@ -46,6 +48,7 @@ const STEP_FIELDS: FieldPath<DonorRegistrationInput>[][] = [
 
 export function DonorRegisterForm() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
 
@@ -86,16 +89,34 @@ export function DonorRegisterForm() {
       return;
     }
 
+    setIsConfirming(true);
+  }
+
+  async function onConfirm() {
     setIsSubmitting(true);
     const result = await registerDonor(getValues());
 
     if (!result.ok) {
       toast.error(result.error);
       setIsSubmitting(false);
+      setIsConfirming(false);
       return;
     }
 
+    setIsConfirming(false);
     setIsRegistered(true);
+  }
+
+  function buildSummary(): SummaryRow[] {
+    const values = getValues();
+
+    return [
+      { label: "Nama restoran", value: values.name },
+      { label: "Email", value: values.email },
+      { label: "Telepon", value: values.phone },
+      { label: "Alamat", value: values.address },
+      { label: "Dokumen", value: values.document?.name ?? "Belum dipilih" },
+    ];
   }
 
   return (
@@ -213,6 +234,14 @@ export function DonorRegisterForm() {
           </Field>
         ) : null}
       </RegisterStepper>
+
+      <ConfirmRegistrationDialog
+        open={isConfirming}
+        rows={isConfirming ? buildSummary() : []}
+        isSubmitting={isSubmitting}
+        onCancel={() => setIsConfirming(false)}
+        onConfirm={onConfirm}
+      />
 
       <PendingVerificationDialog
         open={isRegistered}

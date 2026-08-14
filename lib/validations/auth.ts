@@ -46,7 +46,7 @@ export const donorRegistrationSchema = accountFields
 export type DonorRegistrationInput = z.infer<typeof donorRegistrationSchema>;
 
 export const recipientRegistrationSchema = accountFields
-  .extend(recipientProfileFields.shape)
+  .extend(recipientProfileFields.omit({ currentNeed: true }).shape)
   .extend({ document: documentFileSchema })
   .refine(passwordMatches, PASSWORD_MISMATCH);
 

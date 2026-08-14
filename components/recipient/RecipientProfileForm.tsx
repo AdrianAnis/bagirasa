@@ -2,14 +2,15 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
+import { ChipGroup } from "@/components/shared/ChipGroup";
 import { Field, FormSection } from "@/components/shared/Field";
 import { LocationPicker } from "@/components/shared/LocationPicker";
+import { SwitchField } from "@/components/shared/SwitchField";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { BASE_ALLERGENS } from "@/lib/config";
 import type { Recipient } from "@/lib/db/recipients";
 import { uploadIdentityDocument } from "@/lib/supabase/storage";
@@ -202,32 +203,33 @@ export function RecipientProfileForm({
         description="Dipakai sebagai penyaring wajib. Donasi yang bertentangan tidak akan pernah dikirimkan kepadamu."
       >
         <Field label="Pantangan alergen">
-          <div className="flex flex-wrap gap-x-5 gap-y-3">
-            {BASE_ALLERGENS.map((allergen) => (
-              <label
-                key={allergen}
-                className="flex items-center gap-2 text-sm capitalize text-brand-ink/80"
-              >
-                <input
-                  type="checkbox"
-                  value={allergen}
-                  className="size-4 accent-brand"
-                  {...register("allergenRestrictions")}
-                />
-                {allergen}
-              </label>
-            ))}
-          </div>
+          <Controller
+            control={control}
+            name="allergenRestrictions"
+            render={({ field }) => (
+              <ChipGroup
+                label="Pantangan alergen"
+                options={BASE_ALLERGENS}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
         </Field>
 
-        <Label className="flex items-center gap-2 text-sm font-normal text-brand-ink/80">
-          <input
-            type="checkbox"
-            className="size-4 accent-brand"
-            {...register("halalOnly")}
-          />
-          Hanya menerima makanan halal
-        </Label>
+        <Controller
+          control={control}
+          name="halalOnly"
+          render={({ field }) => (
+            <SwitchField
+              id="halalOnly"
+              label="Hanya menerima makanan halal"
+              description="Donasi non-halal tidak akan dicocokkan denganmu."
+              checked={field.value}
+              onCheckedChange={field.onChange}
+            />
+          )}
+        />
       </FormSection>
 
       <FormSection

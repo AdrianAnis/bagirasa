@@ -2,20 +2,23 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { useForm, useWatch, type FieldPath } from "react-hook-form";
+import { Controller, useForm, useWatch, type FieldPath } from "react-hook-form";
 import { toast } from "sonner";
 
 import {
-  PendingVerificationDialog,
-} from "@/components/auth/PendingVerificationDialog";
+  ConfirmRegistrationDialog,
+  type SummaryRow,
+} from "@/components/auth/ConfirmRegistrationDialog";
+import { PendingVerificationDialog } from "@/components/auth/PendingVerificationDialog";
 import {
   RegisterStepper,
   type RegisterStep,
 } from "@/components/auth/RegisterStepper";
+import { ChipGroup } from "@/components/shared/ChipGroup";
 import { Field } from "@/components/shared/Field";
 import { LocationPicker } from "@/components/shared/LocationPicker";
+import { SwitchField } from "@/components/shared/SwitchField";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { BASE_ALLERGENS } from "@/lib/config";
 import { registerRecipient } from "@/lib/registration";
 import {
@@ -39,9 +42,8 @@ const STEPS: RegisterStep[] = [
     description: "Identitas dan lokasi yang akan dilihat restoran penyumbang.",
   },
   {
-    title: "Kebutuhan & pantangan",
-    description:
-      "Menentukan berapa porsi yang dialokasikan dan donasi mana yang aman untukmu.",
+    title: "Keamanan pangan",
+    description: "Menentukan donasi mana yang aman dikirimkan kepadamu.",
   },
   {
     title: "Dokumen verifikasi",
@@ -52,7 +54,7 @@ const STEPS: RegisterStep[] = [
 const STEP_FIELDS: FieldPath<RecipientRegistrationInput>[][] = [
   ["email", "password", "confirmPassword"],
   ["name", "address", "phone", "lat", "lng"],
-  ["capacity", "currentNeed", "allergenRestrictions", "halalOnly"],
+  ["capacity", "allergenRestrictions", "halalOnly"],
   ["document"],
 ];
 
@@ -64,6 +66,7 @@ export function RecipientRegisterForm({
   recipientType,
 }: RecipientRegisterFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [isConfirming, setIsConfirming] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
 
@@ -86,7 +89,6 @@ export function RecipientRegisterForm({
       address: "",
       phone: "",
       capacity: 1,
-      currentNeed: 0,
       allergenRestrictions: [],
       halalOnly: true,
     },
@@ -109,16 +111,47 @@ export function RecipientRegisterForm({
       return;
     }
 
+    setIsConfirming(true);
+  }
+
+  async function onConfirm() {
     setIsSubmitting(true);
     const result = await registerRecipient(getValues());
 
     if (!result.ok) {
       toast.error(result.error);
       setIsSubmitting(false);
+      setIsConfirming(false);
       return;
     }
 
+    setIsConfirming(false);
     setIsRegistered(true);
+  }
+
+  function buildSummary(): SummaryRow[] {
+    const values = getValues();
+
+    return [
+      { label: "Jenis lembaga", value: RECIPIENT_TYPE_LABEL[recipientType] },
+      { label: "Nama lembaga", value: values.name },
+      { label: "Email", value: values.email },
+      { label: "Telepon", value: values.phone },
+      { label: "Alamat", value: values.address },
+      { label: "Jumlah penghuni", value: `${values.capacity} orang` },
+      {
+        label: "Pantangan alergen",
+        value:
+          values.allergenRestrictions.length > 0
+            ? values.allergenRestrictions.join(", ")
+            : "Tidak ada",
+      },
+      {
+        label: "Makanan halal saja",
+        value: values.halalOnly ? "Ya" : "Tidak",
+      },
+      { label: "Dokumen", value: values.document?.name ?? "Belum dipilih" },
+    ];
   }
 
   return (
@@ -175,7 +208,10 @@ export function RecipientRegisterForm({
 
         {currentStep === 1 ? (
           <>
-            <Field label="Jenis lembaga" hint="Dipilih saat kamu memulai pendaftaran.">
+            <Field
+              label="Jenis lembaga"
+              hint="Dipilih saat kamu memulai pendaftaran."
+            >
               <p className="rounded-md border border-brand-ink/12 bg-canvas px-3 py-2 text-sm text-brand-ink/70">
                 {RECIPIENT_TYPE_LABEL[recipientType]}
               </p>
@@ -227,64 +263,51 @@ export function RecipientRegisterForm({
 
         {currentStep === 2 ? (
           <>
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field
-                label="Jumlah penghuni"
-                htmlFor="capacity"
-                error={errors.capacity?.message}
-              >
-                <Input
-                  id="capacity"
-                  type="number"
-                  min={1}
-                  {...register("capacity", { valueAsNumber: true })}
-                />
-              </Field>
-
-              <Field
-                label="Kebutuhan porsi saat ini"
-                htmlFor="currentNeed"
-                error={errors.currentNeed?.message}
-              >
-                <Input
-                  id="currentNeed"
-                  type="number"
-                  min={0}
-                  {...register("currentNeed", { valueAsNumber: true })}
-                />
-              </Field>
-            </div>
+            <Field
+              label="Jumlah penghuni"
+              htmlFor="capacity"
+              hint="Dipakai menilai seberapa mendesak kebutuhanmu dibanding lembaga lain."
+              error={errors.capacity?.message}
+            >
+              <Input
+                id="capacity"
+                type="number"
+                min={1}
+                {...register("capacity", { valueAsNumber: true })}
+              />
+            </Field>
 
             <Field
               label="Pantangan alergen"
               hint="Donasi yang mengandung alergen ini tidak akan pernah dikirimkan kepadamu."
             >
-              <div className="flex flex-wrap gap-x-5 gap-y-3">
-                {BASE_ALLERGENS.map((allergen) => (
-                  <label
-                    key={allergen}
-                    className="flex items-center gap-2 text-sm capitalize text-brand-ink/80"
-                  >
-                    <input
-                      type="checkbox"
-                      value={allergen}
-                      className="size-4 accent-brand"
-                      {...register("allergenRestrictions")}
-                    />
-                    {allergen}
-                  </label>
-                ))}
-              </div>
+              <Controller
+                control={control}
+                name="allergenRestrictions"
+                render={({ field }) => (
+                  <ChipGroup
+                    label="Pantangan alergen"
+                    options={BASE_ALLERGENS}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
             </Field>
 
-            <Label className="flex items-center gap-2 text-sm font-normal text-brand-ink/80">
-              <input
-                type="checkbox"
-                className="size-4 accent-brand"
-                {...register("halalOnly")}
-              />
-              Hanya menerima makanan halal
-            </Label>
+            <Controller
+              control={control}
+              name="halalOnly"
+              render={({ field }) => (
+                <SwitchField
+                  id="halalOnly"
+                  label="Hanya menerima makanan halal"
+                  description="Donasi non-halal tidak akan dicocokkan denganmu."
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
           </>
         ) : null}
 
@@ -307,6 +330,14 @@ export function RecipientRegisterForm({
           </Field>
         ) : null}
       </RegisterStepper>
+
+      <ConfirmRegistrationDialog
+        open={isConfirming}
+        rows={isConfirming ? buildSummary() : []}
+        isSubmitting={isSubmitting}
+        onCancel={() => setIsConfirming(false)}
+        onConfirm={onConfirm}
+      />
 
       <PendingVerificationDialog
         open={isRegistered}
