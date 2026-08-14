@@ -4,21 +4,16 @@ import { DonationList } from "@/components/donation/DonationList";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { RatingStars } from "@/components/shared/RatingStars";
-import { VerificationNotice } from "@/components/shared/VerificationNotice";
 import { Button } from "@/components/ui/button";
 import { listDonorDonations } from "@/lib/db/donations";
 import { getCurrentDonor } from "@/lib/db/donors";
 import { listDonorFeedback } from "@/lib/db/feedback";
-import { getCurrentProfile } from "@/lib/db/profiles";
 
 export default async function DonorDashboardPage() {
-  const [profile, donor, donations] = await Promise.all([
-    getCurrentProfile(),
+  const [donor, donations] = await Promise.all([
     getCurrentDonor(),
     listDonorDonations(),
   ]);
-
-  const isVerified = profile?.verification_status === "verified";
 
   const countServings = (donation: (typeof donations)[number]) =>
     donation.food_items.reduce((sum, item) => sum + item.servings, 0);
@@ -49,47 +44,26 @@ export default async function DonorDashboardPage() {
       <PageHeader
         eyebrow="Penyumbang"
         title={donor?.name ?? "Dashboard donor"}
-        description={
-          donor
-            ? donor.address
-            : "Lengkapi profil restoran dulu. Donasi baru bisa dibuat setelah lokasi dan dokumen terisi."
-        }
+        description={donor?.address ?? "Profil restoran belum lengkap."}
         actions={
-          donor && isVerified ? (
-            <Button asChild>
-              <Link href="/donor/donations/new">Buat donasi</Link>
-            </Button>
-          ) : (
-            <Button asChild>
-              <Link href="/donor/profile">
-                {donor ? "Ubah profil" : "Lengkapi profil"}
-              </Link>
-            </Button>
-          )
+          <Button asChild>
+            <Link href="/donor/donations/new">Buat donasi</Link>
+          </Button>
         }
       />
 
-      {profile ? (
-        <VerificationNotice
-          status={profile.verification_status}
-          role="donor"
-        />
-      ) : null}
+      <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.label} className="bg-white px-5 py-6">
+            <dt className="eyebrow text-brand-ink/40">{stat.label}</dt>
+            <dd className="numeric mt-2 text-3xl font-semibold text-brand-ink">
+              {stat.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
 
-      {donor ? (
-        <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className="bg-white px-5 py-6">
-              <dt className="eyebrow text-brand-ink/40">{stat.label}</dt>
-              <dd className="numeric mt-2 text-3xl font-semibold text-brand-ink">
-                {stat.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      ) : null}
-
-      {donor && feedback.length > 0 ? (
+      {feedback.length > 0 ? (
         <section className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-brand-ink">
@@ -129,24 +103,10 @@ export default async function DonorDashboardPage() {
         {donations.length === 0 ? (
           <EmptyState
             title="Belum ada donasi"
-            description={
-              !donor
-                ? "Lengkapi profil restoran dulu sebelum membuat donasi pertama."
-                : isVerified
-                  ? "Catat sisa makanan hari ini, lalu salurkan ke panti terdekat yang membutuhkan."
-                  : "Donasi bisa dibuat setelah admin memverifikasi akunmu."
-            }
+            description="Catat sisa makanan hari ini, lalu salurkan ke panti terdekat yang membutuhkan."
             action={
               <Button asChild>
-                <Link
-                  href={
-                    donor && isVerified
-                      ? "/donor/donations/new"
-                      : "/donor/profile"
-                  }
-                >
-                  {donor && isVerified ? "Buat donasi" : "Lengkapi profil"}
-                </Link>
+                <Link href="/donor/donations/new">Buat donasi</Link>
               </Button>
             }
           />

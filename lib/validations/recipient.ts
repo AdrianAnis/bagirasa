@@ -1,32 +1,18 @@
 import { z } from "zod";
 
 import { BASE_ALLERGENS } from "@/lib/config";
-import {
-  ACCEPTED_DOCUMENT_TYPES,
-  MAX_UPLOAD_BYTES,
-} from "@/lib/validations/donor";
+import { documentFileSchema } from "@/lib/validations/upload";
 
 export const RECIPIENT_TYPES = ["panti_asuhan", "rumah_lansia"] as const;
 
-export const RECIPIENT_TYPE_LABEL: Record<
-  (typeof RECIPIENT_TYPES)[number],
-  string
-> = {
+export type RecipientType = (typeof RECIPIENT_TYPES)[number];
+
+export const RECIPIENT_TYPE_LABEL: Record<RecipientType, string> = {
   panti_asuhan: "Panti Asuhan",
   rumah_lansia: "Rumah Lansia",
 };
 
-const legalDocFileSchema = z
-  .instanceof(File)
-  .refine((file) => file.size > 0, "File belum dipilih")
-  .refine((file) => file.size <= MAX_UPLOAD_BYTES, "Ukuran file maksimal 5 MB")
-  .refine(
-    (file) =>
-      (ACCEPTED_DOCUMENT_TYPES as readonly string[]).includes(file.type),
-    "Format harus JPG, PNG, WEBP, atau PDF",
-  );
-
-const recipientProfileFields = z.object({
+export const recipientProfileFields = z.object({
   type: z.enum(RECIPIENT_TYPES),
   name: z.string().trim().min(3, "Nama lembaga minimal 3 karakter"),
   address: z.string().trim().min(10, "Alamat minimal 10 karakter"),
@@ -55,11 +41,11 @@ const recipientProfileFields = z.object({
 });
 
 export const recipientProfileCreateSchema = recipientProfileFields.extend({
-  legalDocFile: legalDocFileSchema,
+  legalDocFile: documentFileSchema,
 });
 
 export const recipientProfileUpdateSchema = recipientProfileFields.extend({
-  legalDocFile: legalDocFileSchema.optional(),
+  legalDocFile: documentFileSchema.optional(),
 });
 
 export type RecipientProfileFormInput = z.infer<

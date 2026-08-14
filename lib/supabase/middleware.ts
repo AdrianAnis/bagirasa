@@ -1,7 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { AUTH_ROUTES, ROLE_HOME } from "@/lib/config";
+import {
+  AUTH_ROUTES,
+  PROFILE_ROUTE,
+  ROLE_HOME,
+  VERIFICATION_ROUTE,
+} from "@/lib/config";
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/supabase/env";
 import type { Database } from "@/types/database.types";
 
@@ -64,7 +69,7 @@ export async function updateSession(request: NextRequest) {
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, verification_status")
     .eq("id", user.id)
     .single();
 
@@ -76,14 +81,34 @@ export async function updateSession(request: NextRequest) {
   }
 
   const home = ROLE_HOME[profile.role];
+  const isVerified = profile.verification_status === "verified";
 
   if (isAuthRoute(pathname)) {
+    return redirectTo(request, isVerified ? home : VERIFICATION_ROUTE);
+  }
+
+  if (pathname.startsWith(VERIFICATION_ROUTE)) {
+    return isVerified ? redirectTo(request, home) : response;
+  }
+
+  if (!requiredRole) {
+    return response;
+  }
+
+  if (requiredRole !== profile.role) {
     return redirectTo(request, home);
   }
 
-  if (requiredRole && requiredRole !== profile.role) {
-    return redirectTo(request, home);
+  if (isVerified) {
+    return response;
   }
 
-  return response;
+  const profileRoute =
+    profile.role === "admin" ? null : PROFILE_ROUTE[profile.role];
+
+  if (profileRoute && pathname === profileRoute) {
+    return response;
+  }
+
+  return redirectTo(request, VERIFICATION_ROUTE);
 }

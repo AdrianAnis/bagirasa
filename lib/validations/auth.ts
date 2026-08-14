@@ -1,7 +1,17 @@
 import { z } from "zod";
 
+import { donorProfileFields } from "@/lib/validations/donor";
+import { recipientProfileFields } from "@/lib/validations/recipient";
+import { documentFileSchema } from "@/lib/validations/upload";
+
 export const REGISTRABLE_ROLES = ["donor", "recipient"] as const;
-export const RECIPIENT_TYPES = ["panti_asuhan", "rumah_lansia"] as const;
+
+export type RegistrableRole = (typeof REGISTRABLE_ROLES)[number];
+
+export const ROLE_LABEL: Record<RegistrableRole, string> = {
+  donor: "Penyumbang",
+  recipient: "Penerima",
+};
 
 export const loginSchema = z.object({
   email: z.email("Format email tidak valid"),
@@ -10,24 +20,36 @@ export const loginSchema = z.object({
 
 export type LoginInput = z.infer<typeof loginSchema>;
 
-export const registerSchema = z
-  .object({
-    email: z.email("Format email tidak valid"),
-    password: z.string().min(8, "Password minimal 8 karakter"),
-    confirmPassword: z.string().min(1, "Konfirmasi password wajib diisi"),
-    role: z.enum(REGISTRABLE_ROLES),
-    recipientType: z.enum(RECIPIENT_TYPES).optional(),
-  })
-  .refine((value) => value.password === value.confirmPassword, {
-    message: "Konfirmasi password tidak sama",
-    path: ["confirmPassword"],
-  })
-  .refine(
-    (value) => value.role !== "recipient" || value.recipientType !== undefined,
-    {
-      message: "Jenis penerima wajib dipilih",
-      path: ["recipientType"],
-    },
-  );
+const accountFields = z.object({
+  email: z.email("Format email tidak valid"),
+  password: z.string().min(8, "Password minimal 8 karakter"),
+  confirmPassword: z.string().min(1, "Konfirmasi password wajib diisi"),
+});
 
-export type RegisterInput = z.infer<typeof registerSchema>;
+const PASSWORD_MISMATCH = {
+  message: "Konfirmasi password tidak sama",
+  path: ["confirmPassword"],
+};
+
+function passwordMatches(value: {
+  password: string;
+  confirmPassword: string;
+}): boolean {
+  return value.password === value.confirmPassword;
+}
+
+export const donorRegistrationSchema = accountFields
+  .extend(donorProfileFields.shape)
+  .extend({ document: documentFileSchema })
+  .refine(passwordMatches, PASSWORD_MISMATCH);
+
+export type DonorRegistrationInput = z.infer<typeof donorRegistrationSchema>;
+
+export const recipientRegistrationSchema = accountFields
+  .extend(recipientProfileFields.shape)
+  .extend({ document: documentFileSchema })
+  .refine(passwordMatches, PASSWORD_MISMATCH);
+
+export type RecipientRegistrationInput = z.infer<
+  typeof recipientRegistrationSchema
+>;

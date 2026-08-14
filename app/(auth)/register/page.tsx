@@ -1,21 +1,22 @@
 import { redirect } from "next/navigation";
 
-import { RegisterForm } from "@/components/auth/RegisterForm";
+import { DonorRegisterForm } from "@/components/auth/DonorRegisterForm";
+import { RecipientRegisterForm } from "@/components/auth/RecipientRegisterForm";
+import {
+  REGISTRABLE_ROLES,
+  type RegistrableRole,
+} from "@/lib/validations/auth";
 import {
   RECIPIENT_TYPES,
-  REGISTRABLE_ROLES,
-  type RegisterInput,
-} from "@/lib/validations/auth";
+  type RecipientType,
+} from "@/lib/validations/recipient";
 
-function parseRole(value: string | undefined): RegisterInput["role"] | null {
-  const match = REGISTRABLE_ROLES.find((role) => role === value);
-  return match ?? null;
+function parseRole(value: string | undefined): RegistrableRole | null {
+  return REGISTRABLE_ROLES.find((role) => role === value) ?? null;
 }
 
-function parseRecipientType(
-  value: string | undefined,
-): RegisterInput["recipientType"] {
-  return RECIPIENT_TYPES.find((type) => type === value);
+function parseRecipientType(value: string | undefined): RecipientType | null {
+  return RECIPIENT_TYPES.find((type) => type === value) ?? null;
 }
 
 export default async function RegisterPage({
@@ -30,13 +31,17 @@ export default async function RegisterPage({
     redirect("/choose-role");
   }
 
+  if (role === "donor") {
+    return <DonorRegisterForm />;
+  }
+
   const recipientType = parseRecipientType(
     typeof params.type === "string" ? params.type : undefined,
   );
 
-  if (role === "recipient" && !recipientType) {
+  if (!recipientType) {
     redirect("/choose-role");
   }
 
-  return <RegisterForm role={role} recipientType={recipientType} />;
+  return <RecipientRegisterForm recipientType={recipientType} />;
 }

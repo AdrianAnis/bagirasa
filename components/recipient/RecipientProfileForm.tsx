@@ -130,19 +130,37 @@ export function RecipientProfileForm({
         </Field>
 
         <Field
-          label="Alamat lengkap"
-          htmlFor="address"
-          error={errors.address?.message}
-        >
-          <Input id="address" {...register("address")} />
-        </Field>
-
-        <Field
           label="Nomor telepon pengurus"
           htmlFor="phone"
           error={errors.phone?.message}
         >
           <Input id="phone" inputMode="numeric" {...register("phone")} />
+        </Field>
+
+        <Field
+          label="Lokasi lembaga"
+          hint="Geser pin bila lokasimu berubah. Alamatnya ikut diperbarui."
+          error={errors.lat?.message ?? errors.lng?.message}
+        >
+          <LocationPicker
+            value={position}
+            onChange={(next) => {
+              setValue("lat", next.lat, { shouldValidate: true });
+              setValue("lng", next.lng, { shouldValidate: true });
+            }}
+            onAddressResolved={(address) =>
+              setValue("address", address, { shouldValidate: true })
+            }
+          />
+        </Field>
+
+        <Field
+          label="Alamat"
+          htmlFor="address"
+          hint="Terisi otomatis dari pin. Tambahkan nomor bangunan atau patokan bila perlu."
+          error={errors.address?.message}
+        >
+          <Input id="address" {...register("address")} />
         </Field>
       </FormSection>
 
@@ -177,20 +195,6 @@ export function RecipientProfileForm({
             />
           </Field>
         </div>
-      </FormSection>
-
-      <FormSection
-        title="Titik lokasi"
-        description="Dipakai menghitung jarak ke restoran penyumbang."
-      >
-        <LocationPicker
-          value={position}
-          onChange={(next) => {
-            setValue("lat", next.lat, { shouldValidate: true });
-            setValue("lng", next.lng, { shouldValidate: true });
-          }}
-          error={errors.lat?.message ?? errors.lng?.message}
-        />
       </FormSection>
 
       <FormSection

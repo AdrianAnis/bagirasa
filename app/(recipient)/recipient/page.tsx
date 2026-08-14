@@ -3,16 +3,13 @@ import Link from "next/link";
 import { IncomingDonationCard } from "@/components/recipient/IncomingDonationCard";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { VerificationNotice } from "@/components/shared/VerificationNotice";
 import { Button } from "@/components/ui/button";
 import { listRecipientMatches } from "@/lib/db/matches";
-import { getCurrentProfile } from "@/lib/db/profiles";
 import { getCurrentRecipient } from "@/lib/db/recipients";
 import { RECIPIENT_TYPE_LABEL } from "@/lib/validations/recipient";
 
 export default async function RecipientDashboardPage() {
-  const [profile, recipient, matches] = await Promise.all([
-    getCurrentProfile(),
+  const [recipient, matches] = await Promise.all([
     getCurrentRecipient(),
     listRecipientMatches(),
   ]);
@@ -37,43 +34,26 @@ export default async function RecipientDashboardPage() {
   return (
     <div className="flex flex-col gap-10">
       <PageHeader
-        eyebrow={
-          recipient ? RECIPIENT_TYPE_LABEL[recipient.type] : "Penerima"
-        }
+        eyebrow={recipient ? RECIPIENT_TYPE_LABEL[recipient.type] : "Penerima"}
         title={recipient?.name ?? "Dashboard penerima"}
-        description={
-          recipient
-            ? recipient.address
-            : "Lengkapi profil lembaga dulu. Donasi baru bisa masuk setelah lokasi, kapasitas, dan pantangan alergen terisi."
-        }
+        description={recipient?.address ?? "Profil lembaga belum lengkap."}
         actions={
-          <Button asChild variant={recipient ? "outline" : "default"}>
-            <Link href="/recipient/profile">
-              {recipient ? "Ubah profil" : "Lengkapi profil"}
-            </Link>
+          <Button asChild variant="outline">
+            <Link href="/recipient/profile">Ubah profil</Link>
           </Button>
         }
       />
 
-      {profile ? (
-        <VerificationNotice
-          status={profile.verification_status}
-          role="recipient"
-        />
-      ) : null}
-
-      {recipient ? (
-        <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className="bg-white px-5 py-6">
-              <dt className="eyebrow text-brand-ink/40">{stat.label}</dt>
-              <dd className="numeric mt-2 text-3xl font-semibold text-brand-ink">
-                {stat.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      ) : null}
+      <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <div key={stat.label} className="bg-white px-5 py-6">
+            <dt className="eyebrow text-brand-ink/40">{stat.label}</dt>
+            <dd className="numeric mt-2 text-3xl font-semibold text-brand-ink">
+              {stat.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
 
       {incoming.length > 0 ? (
         <section className="flex flex-col gap-4">
@@ -101,21 +81,8 @@ export default async function RecipientDashboardPage() {
         </h2>
         {history.length === 0 ? (
           <EmptyState
-            title={
-              recipient ? "Belum ada riwayat" : "Profil lembaga belum lengkap"
-            }
-            description={
-              recipient
-                ? "Donasi yang kamu terima atau tolak akan tercatat di sini."
-                : "Isi kapasitas, kebutuhan porsi, dan pantangan alergen agar donasi bisa dicocokkan denganmu."
-            }
-            action={
-              recipient ? null : (
-                <Button asChild>
-                  <Link href="/recipient/profile">Lengkapi profil</Link>
-                </Button>
-              )
-            }
+            title="Belum ada riwayat"
+            description="Donasi yang kamu terima atau tolak akan tercatat di sini."
           />
         ) : (
           history.map((match) => (

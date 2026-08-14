@@ -1,28 +1,8 @@
 import { z } from "zod";
 
-export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+import { documentFileSchema } from "@/lib/validations/upload";
 
-export const ACCEPTED_DOCUMENT_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "application/pdf",
-] as const;
-
-const documentFileSchema = z
-  .instanceof(File)
-  .refine((file) => file.size > 0, "File belum dipilih")
-  .refine(
-    (file) => file.size <= MAX_UPLOAD_BYTES,
-    "Ukuran file maksimal 5 MB",
-  )
-  .refine(
-    (file) =>
-      (ACCEPTED_DOCUMENT_TYPES as readonly string[]).includes(file.type),
-    "Format harus JPG, PNG, WEBP, atau PDF",
-  );
-
-const donorProfileFields = z.object({
+export const donorProfileFields = z.object({
   name: z.string().trim().min(3, "Nama restoran minimal 3 karakter"),
   address: z.string().trim().min(10, "Alamat minimal 10 karakter"),
   lat: z
