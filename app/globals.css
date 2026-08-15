@@ -12,6 +12,7 @@
   --color-canvas: #f7f8f7;
   --color-chart: #0f8a57;
   --color-chart-soft: #cfe8dc;
+  --color-brand-light: #8fdcb6;
   --font-mono: var(--font-plex-mono);
   --text-display: 3.25rem;
   --text-display--line-height: 1.04;
@@ -35,6 +36,27 @@
 @utility numeric {
   font-family: var(--font-plex-mono);
   font-variant-numeric: tabular-nums;
+}
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility animate-rise {
+  animation: fade-rise 620ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise {
+    animation: none;
+  }
 }
 
 @theme inline {
@@ -87,8 +109,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #23674e;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -97,8 +119,8 @@
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --input: #d7dedb;
+  --ring: #23674e;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
