@@ -31,7 +31,6 @@ export default async function RecipientProfilePage() {
   return (
     <div className="flex flex-col gap-10">
       <PageHeader
-        eyebrow="Penerima"
         title="Profil lembaga"
         description="Pantangan alergen dan status halal dipakai sebagai penyaring wajib. Donasi yang bertentangan tidak akan pernah dikirimkan kepadamu."
       />

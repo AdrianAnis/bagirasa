@@ -24,6 +24,7 @@ export type PeakHour = {
 export type DonorAnalytics = {
   donorId: string;
   totalDonations: number;
+  availableDonations: number;
   totalServings: number;
   distributedServings: number;
   completedServings: number;
@@ -85,6 +86,7 @@ export async function getDonorAnalytics(): Promise<DonorAnalytics | null> {
   let totalServings = 0;
   let distributedServings = 0;
   let completedServings = 0;
+  let availableDonations = 0;
 
   for (let offset = 0; offset < TREND_DAYS; offset++) {
     const day = new Date(periodStart.getTime() + offset * 24 * 60 * 60 * 1000);
@@ -101,6 +103,10 @@ export async function getDonorAnalytics(): Promise<DonorAnalytics | null> {
 
     if (donation.status === "matched" || donation.status === "completed") {
       distributedServings += servings;
+    }
+
+    if (donation.status === "available") {
+      availableDonations += 1;
     }
 
     for (const match of donation.donation_matches) {
@@ -165,6 +171,7 @@ export async function getDonorAnalytics(): Promise<DonorAnalytics | null> {
   return {
     donorId: donor.id,
     totalDonations: rows.length,
+    availableDonations,
     totalServings,
     distributedServings,
     completedServings,

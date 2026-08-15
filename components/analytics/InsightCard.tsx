@@ -60,13 +60,15 @@ export function InsightCard({ insight }: InsightCardProps) {
     : [];
 
   return (
-    <section className="rounded-xl border border-brand-ink/10 bg-white p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-brand-ink/10 pb-4">
+    <section className="rounded-xl border border-brand-ink/8 bg-white p-5">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="eyebrow text-brand/70">Insight AI</p>
-          <h2 className="mt-1 font-semibold text-brand-ink">
+          <h2 className="font-semibold text-brand-ink">
             Ringkasan pola surplusmu
           </h2>
+          <p className="mt-1 text-sm text-brand-ink/50">
+            Dirangkum otomatis dari data donasimu.
+          </p>
         </div>
         <Button
           variant="outline"
@@ -93,21 +95,21 @@ export function InsightCard({ insight }: InsightCardProps) {
           ) : null}
 
           {impact ? (
-            <dl className="grid gap-px overflow-hidden rounded-lg border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-3">
-              <div className="bg-white px-4 py-4">
-                <dt className="eyebrow text-brand-ink/40">Porsi diselamatkan</dt>
+            <dl className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-lg border border-brand-ink/8 px-4 py-3.5">
+                <dt className="text-sm text-brand-ink/50">Porsi diselamatkan</dt>
                 <dd className="numeric mt-1.5 text-2xl font-semibold text-brand-ink">
                   {impact.mealsRescued}
                 </dd>
               </div>
-              <div className="bg-white px-4 py-4">
-                <dt className="eyebrow text-brand-ink/40">Estimasi makanan</dt>
+              <div className="rounded-lg border border-brand-ink/8 px-4 py-3.5">
+                <dt className="text-sm text-brand-ink/50">Estimasi makanan</dt>
                 <dd className="numeric mt-1.5 text-2xl font-semibold text-brand-ink">
                   {impact.estKg} kg
                 </dd>
               </div>
-              <div className="bg-white px-4 py-4">
-                <dt className="eyebrow text-brand-ink/40">Estimasi CO₂e</dt>
+              <div className="rounded-lg border border-brand-ink/8 px-4 py-3.5">
+                <dt className="text-sm text-brand-ink/50">Estimasi CO₂e</dt>
                 <dd className="numeric mt-1.5 text-2xl font-semibold text-brand-ink">
                   {impact.estCo2Kg} kg
                 </dd>

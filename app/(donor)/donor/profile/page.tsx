@@ -17,7 +17,6 @@ export default async function DonorProfilePage() {
   return (
     <div className="flex flex-col gap-10">
       <PageHeader
-        eyebrow="Penyumbang"
         title="Profil restoran"
         description="Lokasi menentukan panti mana yang dicocokkan dengan donasimu. Dokumen KTP dipakai admin untuk verifikasi dan disimpan di penyimpanan privat."
       />

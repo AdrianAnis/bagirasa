@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation";
 
-import { AppNav, type NavLink } from "@/components/shared/AppNav";
+import {
+  AppNav,
+  type NavLink,
+  type PrimaryAction,
+} from "@/components/shared/AppNav";
 import { getCurrentDonor } from "@/lib/db/donors";
 import { countUnreadNotifications } from "@/lib/db/notifications";
 import { getCurrentProfile } from "@/lib/db/profiles";
@@ -14,15 +18,24 @@ const NOTIFICATIONS_HREF: Record<string, string> = {
 const NAV_LINKS: Record<string, NavLink[]> = {
   donor: [
     { href: "/donor", label: "Dashboard" },
-    { href: "/donor/donations/new", label: "Buat donasi" },
-    { href: "/donor/analytics", label: "Analitik" },
-    { href: "/donor/profile", label: "Profil restoran" },
+    { href: "/donor/donations", label: "Histori" },
   ],
-  recipient: [
-    { href: "/recipient", label: "Dashboard" },
-    { href: "/recipient/profile", label: "Profil lembaga" },
-  ],
+  recipient: [{ href: "/recipient", label: "Dashboard" }],
   admin: [{ href: "/admin", label: "Verifikasi akun" }],
+};
+
+const PRIMARY_ACTION: Record<string, PrimaryAction> = {
+  donor: { href: "/donor/donations/new", label: "Buat donasi" },
+};
+
+const PROFILE_HREF: Record<string, string> = {
+  donor: "/donor/profile",
+  recipient: "/recipient/profile",
+};
+
+const PROFILE_LABEL: Record<string, string> = {
+  donor: "Profil restoran",
+  recipient: "Profil lembaga",
 };
 
 const ROLE_LABEL: Record<string, string> = {
@@ -61,6 +74,9 @@ export async function AppShell({ children }: AppShellProps) {
         organisationName={organisation}
         verificationStatus={profile.verification_status}
         notificationsHref={notificationsHref}
+        profileHref={PROFILE_HREF[profile.role] ?? null}
+        profileLabel={PROFILE_LABEL[profile.role] ?? "Profil"}
+        primaryAction={PRIMARY_ACTION[profile.role] ?? null}
         unreadCount={unreadCount}
       />
       <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
