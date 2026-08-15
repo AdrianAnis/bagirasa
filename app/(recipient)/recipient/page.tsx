@@ -15,41 +15,47 @@ export default async function RecipientDashboardPage() {
 
   const incoming = matches.filter((match) => match.status === "pending");
   const inProgress = matches.filter((match) => match.status === "accepted");
-  const history = matches.filter(
-    (match) => match.status === "completed" || match.status === "rejected",
+  const completed = matches.filter((match) => match.status === "completed");
+
+  const receivedServings = completed.reduce(
+    (total, match) => total + match.allocated_servings,
+    0,
   );
 
-  const receivedServings = matches
-    .filter((match) => match.status === "completed")
-    .reduce((total, match) => total + match.allocated_servings, 0);
+  const donorNames = new Set(
+    completed
+      .map((match) => match.food_donations?.donors?.name)
+      .filter((name): name is string => Boolean(name)),
+  );
 
   const stats = [
-    { label: "Menunggu jawaban", value: incoming.length },
-    { label: "Menunggu penyerahan", value: inProgress.length },
-    { label: "Kebutuhan porsi", value: recipient?.current_need ?? 0 },
-    { label: "Porsi diterima", value: receivedServings },
+    { label: "Porsi diterima", value: `${receivedServings}`, unit: null },
+    { label: "Donasi diterima", value: `${completed.length}`, unit: null },
+    { label: "Restoran penyumbang", value: `${donorNames.size}`, unit: null },
+    {
+      label: "Kebutuhan porsi",
+      value: `${recipient?.current_need ?? 0}`,
+      unit: "hari ini",
+    },
   ];
 
+  const hasActivity = incoming.length > 0 || inProgress.length > 0;
+
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8">
       <PageHeader
         title={recipient?.name ?? "Dashboard penerima"}
         description={recipient?.address ?? "Profil lembaga belum lengkap."}
-        actions={
-          <Button asChild variant="outline">
-            <Link href="/recipient/profile">Ubah profil</Link>
-          </Button>
-        }
       />
 
       {recipient && recipient.current_need <= 0 ? (
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4">
           <div>
             <p className="font-medium text-amber-900">
-              Belum menerima donasi masuk
+              Lembagamu belum ikut dicocokkan
             </p>
             <p className="mt-1 text-sm text-amber-900/70">
-              Kebutuhan porsimu masih 0, jadi lembagamu belum ikut dicocokkan.
+              Kebutuhan porsimu masih 0, jadi tidak ada donasi yang akan masuk.
               Isi berapa porsi yang kamu butuhkan hari ini.
             </p>
           </div>
@@ -59,12 +65,20 @@ export default async function RecipientDashboardPage() {
         </div>
       ) : null}
 
-      <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-2 lg:grid-cols-4">
+      <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <div key={stat.label} className="bg-white px-5 py-6">
-            <dt className="eyebrow text-brand-ink/40">{stat.label}</dt>
+          <div
+            key={stat.label}
+            className="rounded-xl border border-brand-ink/8 bg-white px-5 py-5"
+          >
+            <dt className="text-sm text-brand-ink/50">{stat.label}</dt>
             <dd className="numeric mt-2 text-3xl font-semibold text-brand-ink">
               {stat.value}
+              {stat.unit ? (
+                <span className="ml-1.5 text-base font-medium text-brand-ink/35">
+                  {stat.unit}
+                </span>
+              ) : null}
             </dd>
           </div>
         ))}
@@ -72,7 +86,9 @@ export default async function RecipientDashboardPage() {
 
       {incoming.length > 0 ? (
         <section className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold text-brand-ink">Donasi masuk</h2>
+          <h2 className="text-lg font-semibold text-brand-ink">
+            Menunggu jawabanmu
+          </h2>
           {incoming.map((match) => (
             <IncomingDonationCard key={match.id} match={match} />
           ))}
@@ -90,21 +106,17 @@ export default async function RecipientDashboardPage() {
         </section>
       ) : null}
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-brand-ink">
-          Histori penerimaan
-        </h2>
-        {history.length === 0 ? (
-          <EmptyState
-            title="Belum ada riwayat"
-            description="Donasi yang kamu terima atau tolak akan tercatat di sini."
-          />
-        ) : (
-          history.map((match) => (
-            <IncomingDonationCard key={match.id} match={match} />
-          ))
-        )}
-      </section>
+      {hasActivity ? null : (
+        <EmptyState
+          title="Tidak ada donasi yang menunggu"
+          description="Begitu ada restoran terdekat yang mencatat surplus dan cocok dengan lembagamu, donasinya akan muncul di sini."
+          action={
+            <Button asChild variant="outline">
+              <Link href="/recipient/donations">Lihat histori penerimaan</Link>
+            </Button>
+          }
+        />
+      )}
     </div>
   );
 }

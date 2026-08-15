@@ -29,19 +29,17 @@ export default async function RecipientProfilePage() {
     RECIPIENT_TYPES.find((type) => type === metadataType) ?? "panti_asuhan";
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
       <PageHeader
         title="Profil lembaga"
         description="Pantangan alergen dan status halal dipakai sebagai penyaring wajib. Donasi yang bertentangan tidak akan pernah dikirimkan kepadamu."
       />
 
-      <div className="max-w-2xl">
-        <RecipientProfileForm
-          userId={profile.id}
-          recipient={recipient}
-          defaultType={defaultType}
-        />
-      </div>
+      <RecipientProfileForm
+        userId={profile.id}
+        recipient={recipient}
+        defaultType={defaultType}
+      />
     </div>
   );
 }

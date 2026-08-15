@@ -72,16 +72,15 @@ export default async function DonationMatchingPage({
   );
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
       <PageHeader
-        eyebrow="Penyaluran"
         title={`${totalServings} porsi siap disalurkan`}
         description={`${donation.food_items.length} item · ${
           isHalal ? "halal" : "non-halal"
         }${allergens.length > 0 ? ` · alergen: ${allergens.join(", ")}` : " · tanpa alergen tercatat"}`}
       />
 
-      <div className="flex max-w-2xl flex-col gap-6">
+      <div className="flex flex-col gap-6">
         {remaining ? (
           <div className="flex flex-wrap items-baseline justify-between gap-2 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4">
             <span className="text-sm font-medium text-amber-900">

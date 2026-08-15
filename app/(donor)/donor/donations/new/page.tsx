@@ -12,16 +12,13 @@ export default async function NewDonationPage() {
   }
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
       <PageHeader
-        eyebrow="Donasi baru"
         title="Catat sisa makanan"
         description="Satu donasi boleh berisi beberapa item. Isi bahan dan alergen dengan jujur — data inilah yang menjaga penerima tetap aman."
       />
 
-      <div className="max-w-2xl">
-        <DonationForm />
-      </div>
+      <DonationForm />
     </div>
   );
 }

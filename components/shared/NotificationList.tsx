@@ -81,7 +81,7 @@ export function NotificationList({
             className={cn(
               "rounded-xl border px-5 py-4",
               notification.is_read
-                ? "border-brand-ink/10 bg-white"
+                ? "border-brand-ink/8 bg-white"
                 : "border-brand/30 bg-brand-tint/40",
             )}
           >
