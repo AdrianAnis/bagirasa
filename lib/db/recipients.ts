@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import type { RecipientProfilePayload } from "@/lib/validations/recipient";
 import type { Database } from "@/types/database.types";
@@ -8,25 +10,27 @@ export type RecipientResult =
   | { ok: true; data: Recipient }
   | { ok: false; error: string };
 
-export async function getCurrentRecipient(): Promise<Recipient | null> {
-  const supabase = await createClient();
+export const getCurrentRecipient = cache(
+  async (): Promise<Recipient | null> => {
+    const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
-    return null;
-  }
+    if (!user) {
+      return null;
+    }
 
-  const { data } = await supabase
-    .from("recipients")
-    .select("*")
-    .eq("profile_id", user.id)
-    .maybeSingle();
+    const { data } = await supabase
+      .from("recipients")
+      .select("*")
+      .eq("profile_id", user.id)
+      .maybeSingle();
 
-  return data;
-}
+    return data;
+  },
+);
 
 export async function saveRecipientProfile(
   payload: RecipientProfilePayload,

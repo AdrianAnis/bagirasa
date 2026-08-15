@@ -78,16 +78,16 @@ export function IncomingDonationCard({ match }: IncomingDonationCardProps) {
   }
 
   return (
-    <article className="overflow-hidden rounded-xl border border-brand-ink/10 bg-white">
-      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-brand-ink/10 px-5 py-4">
+    <article className="overflow-hidden rounded-xl border border-brand-ink/8 bg-white">
+      <header className="flex flex-wrap items-start justify-between gap-4 border-b border-brand-ink/8 px-5 py-4">
         <div>
-          <p className="eyebrow text-brand-ink/40">
-            {donation ? formatDate(donation.created_at) : ""}
-          </p>
-          <h3 className="mt-1 font-semibold text-brand-ink">{donorName}</h3>
-          <p className="numeric mt-1 text-sm text-brand-ink/50">
-            {match.allocated_servings} porsi ·{" "}
-            {Number(match.distance_km).toFixed(1)} km
+          <h3 className="font-semibold text-brand-ink">{donorName}</h3>
+          <p className="mt-1 text-sm text-brand-ink/50">
+            <span className="numeric">{match.allocated_servings}</span> porsi ·{" "}
+            <span className="numeric">
+              {Number(match.distance_km).toFixed(1)}
+            </span>{" "}
+            km · {donation ? formatDate(donation.created_at) : ""}
           </p>
         </div>
         <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
@@ -153,7 +153,7 @@ export function IncomingDonationCard({ match }: IncomingDonationCardProps) {
       </div>
 
       {feedback ? (
-        <footer className="flex flex-wrap items-center gap-3 border-t border-brand-ink/10 bg-canvas px-5 py-4">
+        <footer className="flex flex-wrap items-center gap-3 border-t border-brand-ink/8 bg-canvas px-5 py-4">
           <RatingStars value={feedback.rating} />
           <span className="text-sm text-brand-ink/55">
             {feedback.comment ? feedback.comment : "Sudah kamu nilai"}
@@ -162,13 +162,13 @@ export function IncomingDonationCard({ match }: IncomingDonationCardProps) {
       ) : null}
 
       {canRate ? (
-        <footer className="border-t border-brand-ink/10 bg-canvas px-5 py-4">
+        <footer className="border-t border-brand-ink/8 bg-canvas px-5 py-4">
           <FeedbackForm matchId={match.id} donorName={donorName} />
         </footer>
       ) : null}
 
       {match.status === "pending" || match.status === "accepted" ? (
-        <footer className="flex flex-wrap gap-3 border-t border-brand-ink/10 bg-canvas px-5 py-4">
+        <footer className="flex flex-wrap gap-3 border-t border-brand-ink/8 bg-canvas px-5 py-4">
           {match.status === "pending" ? (
             <>
               <Button
