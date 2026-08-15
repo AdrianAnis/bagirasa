@@ -15,6 +15,7 @@ import {
   type RegisterStep,
 } from "@/components/auth/RegisterStepper";
 import { Field } from "@/components/shared/Field";
+import { FileField } from "@/components/shared/FileField";
 import { LocationPicker } from "@/components/shared/LocationPicker";
 import { Input } from "@/components/ui/input";
 import { registerDonor } from "@/lib/registration";
@@ -74,6 +75,7 @@ export function DonorRegisterForm() {
 
   const lat = useWatch({ control, name: "lat" });
   const lng = useWatch({ control, name: "lng" });
+  const documentFile = useWatch({ control, name: "document" });
   const position =
     typeof lat === "number" && typeof lng === "number" ? { lat, lng } : null;
 
@@ -126,7 +128,7 @@ export function DonorRegisterForm() {
         currentStep={currentStep}
         eyebrow={ROLE_LABEL.donor}
         isSubmitting={isSubmitting}
-        onBack={() => setCurrentStep(currentStep - 1)}
+        onStepSelect={setCurrentStep}
         onNext={onNext}
       >
         {currentStep === 0 ? (
@@ -219,17 +221,17 @@ export function DonorRegisterForm() {
           <Field
             label="Dokumen KTP pemilik"
             htmlFor="document"
-            hint="Maksimal 5 MB. Format JPG, PNG, WEBP, atau PDF. Disimpan di penyimpanan privat — hanya bisa dibuka olehmu dan admin."
+            hint="Disimpan di penyimpanan privat — hanya bisa dibuka olehmu dan admin."
             error={errors.document?.message as string | undefined}
           >
-            <Input
+            <FileField
               id="document"
-              type="file"
               accept={ACCEPTED_DOCUMENT_ACCEPT_ATTRIBUTE}
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                setValue("document", file as File, { shouldValidate: true });
-              }}
+              placeholder="Pilih foto KTP"
+              file={documentFile}
+              onSelect={(file) =>
+                setValue("document", file, { shouldValidate: true })
+              }
             />
           </Field>
         ) : null}

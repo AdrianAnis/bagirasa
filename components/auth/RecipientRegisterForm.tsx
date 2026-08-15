@@ -16,11 +16,13 @@ import {
 } from "@/components/auth/RegisterStepper";
 import { ChipGroup } from "@/components/shared/ChipGroup";
 import { Field } from "@/components/shared/Field";
+import { FileField } from "@/components/shared/FileField";
 import { LocationPicker } from "@/components/shared/LocationPicker";
 import { SwitchField } from "@/components/shared/SwitchField";
 import { Input } from "@/components/ui/input";
 import { BASE_ALLERGENS } from "@/lib/config";
 import { registerRecipient } from "@/lib/registration";
+import { cn } from "@/lib/utils";
 import {
   recipientRegistrationSchema,
   ROLE_LABEL,
@@ -28,6 +30,7 @@ import {
 } from "@/lib/validations/auth";
 import {
   RECIPIENT_TYPE_LABEL,
+  RECIPIENT_TYPES,
   type RecipientType,
 } from "@/lib/validations/recipient";
 import { ACCEPTED_DOCUMENT_ACCEPT_ATTRIBUTE } from "@/lib/validations/upload";
@@ -96,6 +99,7 @@ export function RecipientRegisterForm({
 
   const lat = useWatch({ control, name: "lat" });
   const lng = useWatch({ control, name: "lng" });
+  const documentFile = useWatch({ control, name: "document" });
   const position =
     typeof lat === "number" && typeof lng === "number" ? { lat, lng } : null;
 
@@ -133,7 +137,7 @@ export function RecipientRegisterForm({
     const values = getValues();
 
     return [
-      { label: "Jenis lembaga", value: RECIPIENT_TYPE_LABEL[recipientType] },
+      { label: "Jenis lembaga", value: RECIPIENT_TYPE_LABEL[values.type] },
       { label: "Nama lembaga", value: values.name },
       { label: "Email", value: values.email },
       { label: "Telepon", value: values.phone },
@@ -159,13 +163,11 @@ export function RecipientRegisterForm({
       <RegisterStepper
         steps={STEPS}
         currentStep={currentStep}
-        eyebrow={`${ROLE_LABEL.recipient} · ${RECIPIENT_TYPE_LABEL[recipientType]}`}
+        eyebrow={ROLE_LABEL.recipient}
         isSubmitting={isSubmitting}
-        onBack={() => setCurrentStep(currentStep - 1)}
+        onStepSelect={setCurrentStep}
         onNext={onNext}
       >
-        <input type="hidden" {...register("type")} />
-
         {currentStep === 0 ? (
           <>
             <Field label="Email" htmlFor="email" error={errors.email?.message}>
@@ -210,11 +212,37 @@ export function RecipientRegisterForm({
           <>
             <Field
               label="Jenis lembaga"
-              hint="Dipilih saat kamu memulai pendaftaran."
+              hint="Tidak bisa diubah sendiri setelah akun dibuat."
             >
-              <p className="rounded-md border border-brand-ink/12 bg-canvas px-3 py-2 text-sm text-brand-ink/70">
-                {RECIPIENT_TYPE_LABEL[recipientType]}
-              </p>
+              <Controller
+                control={control}
+                name="type"
+                render={({ field }) => (
+                  <div
+                    role="radiogroup"
+                    aria-label="Jenis lembaga"
+                    className="grid gap-3 sm:grid-cols-2"
+                  >
+                    {RECIPIENT_TYPES.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        role="radio"
+                        aria-checked={field.value === option}
+                        onClick={() => field.onChange(option)}
+                        className={cn(
+                          "h-11 rounded-lg border px-4 text-sm font-medium transition-colors",
+                          field.value === option
+                            ? "border-brand bg-brand-tint/60 text-brand-deep"
+                            : "border-input text-brand-ink/60 hover:border-brand/50",
+                        )}
+                      >
+                        {RECIPIENT_TYPE_LABEL[option]}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              />
             </Field>
 
             <Field
@@ -315,17 +343,17 @@ export function RecipientRegisterForm({
           <Field
             label="Dokumen legal lembaga"
             htmlFor="document"
-            hint="Maksimal 5 MB. Format JPG, PNG, WEBP, atau PDF. Disimpan di penyimpanan privat — hanya bisa dibuka olehmu dan admin."
+            hint="Disimpan di penyimpanan privat — hanya bisa dibuka olehmu dan admin."
             error={errors.document?.message as string | undefined}
           >
-            <Input
+            <FileField
               id="document"
-              type="file"
               accept={ACCEPTED_DOCUMENT_ACCEPT_ATTRIBUTE}
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                setValue("document", file as File, { shouldValidate: true });
-              }}
+              placeholder="Pilih dokumen lembaga"
+              file={documentFile}
+              onSelect={(file) =>
+                setValue("document", file, { shouldValidate: true })
+              }
             />
           </Field>
         ) : null}

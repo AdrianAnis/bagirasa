@@ -41,11 +41,16 @@ export function ConfirmRegistrationDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <dl className="flex max-h-72 flex-col divide-y divide-brand-ink/8 overflow-y-auto rounded-lg border border-brand-ink/10">
+        <dl className="max-h-72 divide-y divide-brand-ink/8 overflow-y-auto border-y border-brand-ink/8">
           {rows.map((row) => (
-            <div key={row.label} className="flex flex-col gap-0.5 px-4 py-3">
-              <dt className="eyebrow text-brand-ink/40">{row.label}</dt>
-              <dd className="text-sm text-brand-ink">{row.value}</dd>
+            <div
+              key={row.label}
+              className="flex items-baseline justify-between gap-6 py-2.5"
+            >
+              <dt className="shrink-0 text-sm text-brand-ink/45">
+                {row.label}
+              </dt>
+              <dd className="text-right text-sm text-brand-ink">{row.value}</dd>
             </div>
           ))}
         </dl>

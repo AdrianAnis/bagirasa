@@ -3,18 +3,20 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Field } from "@/components/shared/Field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ROLE_HOME } from "@/lib/config";
+import { Label } from "@/components/ui/label";
+import { ROLE_HOME, VERIFICATION_ROUTE } from "@/lib/config";
 import { createClient } from "@/lib/supabase/client";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 
 export function LoginForm() {
   const router = useRouter();
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const {
     register,
@@ -41,7 +43,7 @@ export function LoginForm() {
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, verification_status")
       .eq("id", data.user.id)
       .single();
 
@@ -52,58 +54,105 @@ export function LoginForm() {
       return;
     }
 
+    const destination =
+      profile.verification_status === "verified"
+        ? ROLE_HOME[profile.role]
+        : VERIFICATION_ROUTE;
+
     toast.success("Berhasil masuk");
-    router.replace(ROLE_HOME[profile.role]);
+    router.replace(destination);
     router.refresh();
   }
 
   return (
-    <div className="w-full max-w-sm">
-      <div className="text-center">
-        <p className="eyebrow text-brand/70">Masuk</p>
-        <h1 className="mt-2 text-title font-semibold text-brand-ink">
-          Selamat datang kembali
-        </h1>
-        <p className="mt-2 text-sm text-brand-ink/55">
-          Gunakan email yang kamu daftarkan.
-        </p>
-      </div>
+    <div className="w-full">
+      <h1 className="text-3xl font-semibold tracking-tight text-brand-ink">
+        Masuk
+      </h1>
+      <p className="mt-2 text-sm text-brand-ink/55">
+        Lanjutkan menyalurkan atau menerima donasi hari ini.
+      </p>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 flex flex-col gap-5 rounded-xl border border-brand-ink/10 bg-white p-6"
+        className="mt-8 flex flex-col gap-5"
       >
-        <Field label="Email" htmlFor="email" error={errors.email?.message}>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="email" className="text-brand-ink">
+            Email
+          </Label>
           <Input
             id="email"
             type="email"
             autoComplete="email"
+            placeholder="nama@contoh.com"
+            className="h-11 bg-white"
             {...register("email")}
           />
-        </Field>
+          {errors.email ? (
+            <p className="text-sm text-red-700">{errors.email.message}</p>
+          ) : null}
+        </div>
 
-        <Field
-          label="Password"
-          htmlFor="password"
-          error={errors.password?.message}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="password" className="text-brand-ink">
+            Password
+          </Label>
+          <div className="relative">
+            <Input
+              id="password"
+              type={isPasswordVisible ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="••••••••"
+              className="h-11 bg-white pr-12"
+              {...register("password")}
+            />
+            <button
+              type="button"
+              aria-label={
+                isPasswordVisible ? "Sembunyikan password" : "Tampilkan password"
+              }
+              aria-pressed={isPasswordVisible}
+              onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+              className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-md text-brand-ink/35 transition-colors hover:text-brand"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-[18px]"
+                aria-hidden
+              >
+                <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+                <circle cx="12" cy="12" r="3" />
+                {isPasswordVisible ? <path d="M4 20 20 4" /> : null}
+              </svg>
+            </button>
+          </div>
+          {errors.password ? (
+            <p className="text-sm text-red-700">{errors.password.message}</p>
+          ) : null}
+        </div>
+
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-1 h-11 text-base"
         >
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            {...register("password")}
-          />
-        </Field>
-
-        <Button type="submit" disabled={isSubmitting} size="lg">
           {isSubmitting ? "Memproses..." : "Masuk"}
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-brand-ink/55">
+      <p className="mt-8 text-center text-sm text-brand-ink/55">
         Belum punya akun?{" "}
-        <Link href="/choose-role" className="font-medium text-brand underline">
-          Daftar
+        <Link
+          href="/choose-role"
+          className="font-semibold text-brand underline underline-offset-2"
+        >
+          Daftar sekarang
         </Link>
       </p>
     </div>

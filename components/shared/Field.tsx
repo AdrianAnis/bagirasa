@@ -11,12 +11,18 @@ type FieldProps = {
 export function Field({ label, htmlFor, hint, error, children }: FieldProps) {
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={htmlFor} className="text-brand-ink">
+      <Label
+        htmlFor={htmlFor}
+        className="text-sm font-medium text-brand-ink"
+      >
         {label}
       </Label>
       {children}
-      {hint ? <p className="text-sm text-brand-ink/45">{hint}</p> : null}
-      {error ? <p className="text-sm text-red-700">{error}</p> : null}
+      {error ? (
+        <p className="text-xs font-medium text-red-600">{error}</p>
+      ) : hint ? (
+        <p className="text-xs leading-relaxed text-brand-ink/45">{hint}</p>
+      ) : null}
     </div>
   );
 }

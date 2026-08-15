@@ -12,7 +12,7 @@ const LocationPickerMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-72 w-full items-center justify-center rounded-lg border text-sm text-brand-ink/55">
+      <div className="flex h-64 w-full items-center justify-center rounded-lg border border-input text-sm text-brand-ink/45">
         Memuat peta...
       </div>
     ),
@@ -83,11 +83,20 @@ export function LocationPicker({
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2.5">
+      <LocationPickerMap value={value} onPick={pickPosition} />
+
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-brand-ink/55">
-          Klik peta untuk menaruh pin, atau geser pin yang sudah ada.
-        </p>
+        {isResolving ? (
+          <p className="text-xs text-brand-ink/45">Mencari alamat titik ini...</p>
+        ) : value ? (
+          <p className="numeric text-xs text-brand-ink/45">
+            {value.lat.toFixed(5)}, {value.lng.toFixed(5)}
+          </p>
+        ) : (
+          <p className="text-xs text-brand-ink/45">Belum ada titik dipilih.</p>
+        )}
+
         <Button
           type="button"
           variant="outline"
@@ -99,25 +108,15 @@ export function LocationPicker({
         </Button>
       </div>
 
-      <LocationPickerMap value={value} onPick={pickPosition} />
-
-      {isResolving ? (
-        <p className="text-sm text-brand-ink/55">Mencari alamat titik ini...</p>
-      ) : value ? (
-        <p className="numeric text-sm text-brand-ink/45">
-          {value.lat.toFixed(6)}, {value.lng.toFixed(6)}
-        </p>
-      ) : (
-        <p className="text-sm text-brand-ink/55">Belum ada titik dipilih.</p>
-      )}
-
       {locateError ? (
-        <p className="text-sm text-red-700">{locateError}</p>
+        <p className="text-xs font-medium text-red-600">{locateError}</p>
       ) : null}
       {resolveError ? (
-        <p className="text-sm text-amber-700">{resolveError}</p>
+        <p className="text-xs font-medium text-amber-700">{resolveError}</p>
       ) : null}
-      {error ? <p className="text-sm text-red-700">{error}</p> : null}
+      {error ? (
+        <p className="text-xs font-medium text-red-600">{error}</p>
+      ) : null}
     </div>
   );
 }
