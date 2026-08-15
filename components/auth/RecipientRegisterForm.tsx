@@ -21,6 +21,7 @@ import { SwitchField } from "@/components/shared/SwitchField";
 import { Input } from "@/components/ui/input";
 import { BASE_ALLERGENS } from "@/lib/config";
 import { registerRecipient } from "@/lib/registration";
+import { cn } from "@/lib/utils";
 import {
   recipientRegistrationSchema,
   ROLE_LABEL,
@@ -28,6 +29,7 @@ import {
 } from "@/lib/validations/auth";
 import {
   RECIPIENT_TYPE_LABEL,
+  RECIPIENT_TYPES,
   type RecipientType,
 } from "@/lib/validations/recipient";
 import { ACCEPTED_DOCUMENT_ACCEPT_ATTRIBUTE } from "@/lib/validations/upload";
@@ -96,6 +98,7 @@ export function RecipientRegisterForm({
 
   const lat = useWatch({ control, name: "lat" });
   const lng = useWatch({ control, name: "lng" });
+  const selectedType = useWatch({ control, name: "type" });
   const position =
     typeof lat === "number" && typeof lng === "number" ? { lat, lng } : null;
 
@@ -133,7 +136,7 @@ export function RecipientRegisterForm({
     const values = getValues();
 
     return [
-      { label: "Jenis lembaga", value: RECIPIENT_TYPE_LABEL[recipientType] },
+      { label: "Jenis lembaga", value: RECIPIENT_TYPE_LABEL[values.type] },
       { label: "Nama lembaga", value: values.name },
       { label: "Email", value: values.email },
       { label: "Telepon", value: values.phone },
@@ -159,7 +162,7 @@ export function RecipientRegisterForm({
       <RegisterStepper
         steps={STEPS}
         currentStep={currentStep}
-        eyebrow={`${ROLE_LABEL.recipient} · ${RECIPIENT_TYPE_LABEL[recipientType]}`}
+        eyebrow={`${ROLE_LABEL.recipient} · ${RECIPIENT_TYPE_LABEL[selectedType]}`}
         isSubmitting={isSubmitting}
         onBack={() => setCurrentStep(currentStep - 1)}
         onNext={onNext}
@@ -210,11 +213,37 @@ export function RecipientRegisterForm({
           <>
             <Field
               label="Jenis lembaga"
-              hint="Dipilih saat kamu memulai pendaftaran."
+              hint="Tidak bisa diubah sendiri setelah akun dibuat."
             >
-              <p className="rounded-md border border-brand-ink/12 bg-canvas px-3 py-2 text-sm text-brand-ink/70">
-                {RECIPIENT_TYPE_LABEL[recipientType]}
-              </p>
+              <Controller
+                control={control}
+                name="type"
+                render={({ field }) => (
+                  <div
+                    role="radiogroup"
+                    aria-label="Jenis lembaga"
+                    className="grid gap-3 sm:grid-cols-2"
+                  >
+                    {RECIPIENT_TYPES.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        role="radio"
+                        aria-checked={field.value === option}
+                        onClick={() => field.onChange(option)}
+                        className={cn(
+                          "rounded-lg border px-4 py-3 text-sm font-medium transition-colors",
+                          field.value === option
+                            ? "border-brand bg-brand-tint text-brand-deep"
+                            : "border-brand-ink/15 bg-white text-brand-ink/70 hover:border-brand-ink/30",
+                        )}
+                      >
+                        {RECIPIENT_TYPE_LABEL[option]}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              />
             </Field>
 
             <Field

@@ -35,13 +35,10 @@ export default async function RegisterPage({
     return <DonorRegisterForm />;
   }
 
-  const recipientType = parseRecipientType(
-    typeof params.type === "string" ? params.type : undefined,
-  );
-
-  if (!recipientType) {
-    redirect("/choose-role");
-  }
+  const recipientType =
+    parseRecipientType(
+      typeof params.type === "string" ? params.type : undefined,
+    ) ?? "panti_asuhan";
 
   return <RecipientRegisterForm recipientType={recipientType} />;
 }
