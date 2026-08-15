@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import type { DonorProfilePayload } from "@/lib/validations/donor";
 import type { Database } from "@/types/database.types";
@@ -8,7 +10,7 @@ export type DonorResult =
   | { ok: true; data: Donor }
   | { ok: false; error: string };
 
-export async function getCurrentDonor(): Promise<Donor | null> {
+export const getCurrentDonor = cache(async (): Promise<Donor | null> => {
   const supabase = await createClient();
 
   const {
@@ -26,7 +28,7 @@ export async function getCurrentDonor(): Promise<Donor | null> {
     .maybeSingle();
 
   return data;
-}
+});
 
 export async function saveDonorProfile(
   payload: DonorProfilePayload,
