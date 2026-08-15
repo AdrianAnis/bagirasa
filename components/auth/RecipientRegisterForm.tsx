@@ -16,6 +16,7 @@ import {
 } from "@/components/auth/RegisterStepper";
 import { ChipGroup } from "@/components/shared/ChipGroup";
 import { Field } from "@/components/shared/Field";
+import { FileField } from "@/components/shared/FileField";
 import { LocationPicker } from "@/components/shared/LocationPicker";
 import { SwitchField } from "@/components/shared/SwitchField";
 import { Input } from "@/components/ui/input";
@@ -98,7 +99,7 @@ export function RecipientRegisterForm({
 
   const lat = useWatch({ control, name: "lat" });
   const lng = useWatch({ control, name: "lng" });
-  const selectedType = useWatch({ control, name: "type" });
+  const documentFile = useWatch({ control, name: "document" });
   const position =
     typeof lat === "number" && typeof lng === "number" ? { lat, lng } : null;
 
@@ -162,13 +163,11 @@ export function RecipientRegisterForm({
       <RegisterStepper
         steps={STEPS}
         currentStep={currentStep}
-        eyebrow={`${ROLE_LABEL.recipient} · ${RECIPIENT_TYPE_LABEL[selectedType]}`}
+        eyebrow={ROLE_LABEL.recipient}
         isSubmitting={isSubmitting}
-        onBack={() => setCurrentStep(currentStep - 1)}
+        onStepSelect={setCurrentStep}
         onNext={onNext}
       >
-        <input type="hidden" {...register("type")} />
-
         {currentStep === 0 ? (
           <>
             <Field label="Email" htmlFor="email" error={errors.email?.message}>
@@ -232,10 +231,10 @@ export function RecipientRegisterForm({
                         aria-checked={field.value === option}
                         onClick={() => field.onChange(option)}
                         className={cn(
-                          "rounded-lg border px-4 py-3 text-sm font-medium transition-colors",
+                          "h-11 rounded-lg border px-4 text-sm font-medium transition-colors",
                           field.value === option
-                            ? "border-brand bg-brand-tint text-brand-deep"
-                            : "border-brand-ink/15 bg-white text-brand-ink/70 hover:border-brand-ink/30",
+                            ? "border-brand bg-brand-tint/60 text-brand-deep"
+                            : "border-input text-brand-ink/60 hover:border-brand/50",
                         )}
                       >
                         {RECIPIENT_TYPE_LABEL[option]}
@@ -344,17 +343,17 @@ export function RecipientRegisterForm({
           <Field
             label="Dokumen legal lembaga"
             htmlFor="document"
-            hint="Maksimal 5 MB. Format JPG, PNG, WEBP, atau PDF. Disimpan di penyimpanan privat — hanya bisa dibuka olehmu dan admin."
+            hint="Disimpan di penyimpanan privat — hanya bisa dibuka olehmu dan admin."
             error={errors.document?.message as string | undefined}
           >
-            <Input
+            <FileField
               id="document"
-              type="file"
               accept={ACCEPTED_DOCUMENT_ACCEPT_ATTRIBUTE}
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                setValue("document", file as File, { shouldValidate: true });
-              }}
+              placeholder="Pilih dokumen lembaga"
+              file={documentFile}
+              onSelect={(file) =>
+                setValue("document", file, { shouldValidate: true })
+              }
             />
           </Field>
         ) : null}

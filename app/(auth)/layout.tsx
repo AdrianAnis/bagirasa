@@ -8,25 +8,23 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-svh flex-col bg-canvas">
-      <header className="border-b border-brand-ink/10 bg-white">
-        <div className="mx-auto flex h-16 w-full max-w-5xl items-center px-4">
-          <Logo />
-        </div>
+    <div className="min-h-svh bg-canvas">
+      <header className="mx-auto flex h-20 w-full max-w-xl items-center justify-between px-6">
+        <Logo href="/" />
+        <p className="text-sm text-brand-ink/45">
+          Sudah punya akun?{" "}
+          <Link
+            href="/login"
+            className="font-medium text-brand transition-opacity hover:opacity-70"
+          >
+            Masuk
+          </Link>
+        </p>
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
+      <main className="mx-auto w-full max-w-xl px-6 pb-24 pt-4">
         {children}
       </main>
-
-      <footer className="mx-auto w-full max-w-5xl px-4 py-6">
-        <Link
-          href="/"
-          className="text-sm text-brand-ink/50 transition-colors hover:text-brand"
-        >
-          Kembali ke beranda
-        </Link>
-      </footer>
     </div>
   );
 }

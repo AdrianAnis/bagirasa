@@ -35,10 +35,10 @@ export function ChipGroup<Option extends string>({
             aria-pressed={isSelected}
             onClick={() => toggle(option)}
             className={cn(
-              "rounded-full border px-3.5 py-1.5 text-sm capitalize transition-colors",
+              "h-9 rounded-full border px-4 text-sm capitalize transition-colors",
               isSelected
                 ? "border-brand bg-brand text-white"
-                : "border-brand-ink/15 bg-white text-brand-ink/70 hover:border-brand-ink/30",
+                : "border-input text-brand-ink/60 hover:border-brand/50",
             )}
           >
             {option}

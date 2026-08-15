@@ -41,7 +41,7 @@ export function PendingVerificationDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <p className="rounded-lg bg-canvas px-4 py-3 text-sm text-brand-ink/60">
+        <p className="rounded-xl border border-brand-ink/10 px-4 py-3 text-sm leading-relaxed text-brand-ink/55">
           Kamu akan mendapat notifikasi begitu admin selesai memeriksa. Sambil
           menunggu, data yang kamu kirim masih bisa diperbaiki.
         </p>

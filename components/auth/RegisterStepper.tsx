@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 export type RegisterStep = {
   title: string;
@@ -13,7 +14,7 @@ type RegisterStepperProps = {
   currentStep: number;
   eyebrow: string;
   isSubmitting: boolean;
-  onBack: () => void;
+  onStepSelect: (index: number) => void;
   onNext: () => void;
   children: React.ReactNode;
 };
@@ -23,59 +24,67 @@ export function RegisterStepper({
   currentStep,
   eyebrow,
   isSubmitting,
-  onBack,
+  onStepSelect,
   onNext,
   children,
 }: RegisterStepperProps) {
   const step = steps[currentStep];
   const isLastStep = currentStep === steps.length - 1;
+  const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="w-full max-w-xl">
-      <div className="text-center">
-        <p className="eyebrow text-brand/70">{eyebrow}</p>
-        <h1 className="mt-2 text-title font-semibold text-brand-ink">
+    <div className="overflow-hidden rounded-2xl border border-brand-ink/8 bg-white shadow-[0_1px_2px_rgba(16,36,28,0.04),0_16px_40px_-24px_rgba(16,36,28,0.18)]">
+      <div
+        role="progressbar"
+        aria-valuenow={currentStep + 1}
+        aria-valuemin={1}
+        aria-valuemax={steps.length}
+        aria-label="Kemajuan pendaftaran"
+        className="h-1 w-full bg-brand-ink/8"
+      >
+        <div
+          className="h-full bg-brand transition-[width] duration-300 ease-out"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      <div className="p-6 sm:p-8">
+        <p className="text-xs text-brand-ink/45">
+          Langkah {currentStep + 1} dari {steps.length} · {eyebrow}
+        </p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-brand-ink">
           {step.title}
         </h1>
-        <p className="mt-2 text-sm text-brand-ink/55">{step.description}</p>
+        <p className="mt-2 text-sm leading-relaxed text-brand-ink/55">
+          {step.description}
+        </p>
+
+        <div className="mt-7 flex flex-col gap-6 [&_input]:h-11">{children}</div>
       </div>
 
-      <ol className="mt-6 flex items-center gap-2" aria-label="Kemajuan pendaftaran">
-        {steps.map((item, index) => (
-          <li key={item.title} className="flex-1">
-            <span className="sr-only">
-              Langkah {index + 1} dari {steps.length}: {item.title}
-            </span>
-            <span
-              aria-hidden
-              className={cn(
-                "block h-1 rounded-full transition-colors",
-                index <= currentStep ? "bg-brand" : "bg-brand-ink/12",
-              )}
-            />
-          </li>
-        ))}
-      </ol>
+      <div className="flex items-center justify-between gap-4 border-t border-brand-ink/8 bg-canvas/70 px-6 py-4 sm:px-8">
+        {currentStep === 0 ? (
+          <Button asChild variant="ghost" className="text-brand-ink/55">
+            <Link href="/choose-role">Ganti peran</Link>
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            variant="ghost"
+            className="text-brand-ink/55"
+            disabled={isSubmitting}
+            onClick={() => onStepSelect(currentStep - 1)}
+          >
+            Kembali
+          </Button>
+        )}
 
-      <p className="numeric mt-2 text-center text-xs text-brand-ink/40">
-        Langkah {currentStep + 1} dari {steps.length}
-      </p>
-
-      <div className="mt-6 flex flex-col gap-5 rounded-xl border border-brand-ink/10 bg-white p-6">
-        {children}
-      </div>
-
-      <div className="mt-6 flex items-center justify-between gap-3">
         <Button
           type="button"
-          variant="outline"
-          onClick={onBack}
-          disabled={currentStep === 0 || isSubmitting}
+          size="lg"
+          disabled={isSubmitting}
+          onClick={onNext}
         >
-          Kembali
-        </Button>
-
-        <Button type="button" onClick={onNext} disabled={isSubmitting} size="lg">
           {isSubmitting
             ? "Mendaftarkan..."
             : isLastStep
