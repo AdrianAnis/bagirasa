@@ -1,23 +1,19 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  Controller,
-  useFieldArray,
-  useForm,
-  useWatch,
-} from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 
 import { ChipGroup } from "@/components/shared/ChipGroup";
 import { Field } from "@/components/shared/Field";
+import { SectionCard } from "@/components/shared/SectionCard";
 import { SwitchField } from "@/components/shared/SwitchField";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { BASE_ALLERGENS } from "@/lib/config";
-import { cn } from "@/lib/utils";
 import {
   donationCreateSchema,
   FOOD_TYPE_LABEL,
@@ -27,7 +23,7 @@ import {
 } from "@/lib/validations/donation";
 
 const SELECT_CLASS =
-  "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
+  "h-11 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50";
 
 const EMPTY_ITEM: FoodItemInput = {
   name: "",
@@ -82,28 +78,29 @@ export function DonationForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="flex flex-col gap-4 [&_input]:h-11"
+    >
       {fields.map((field, index) => (
-        <section
+        <SectionCard
           key={field.id}
-          className="rounded-xl border border-brand-ink/10 bg-white p-5"
-        >
-          <div className="flex items-center justify-between gap-4 border-b border-brand-ink/10 pb-4">
-            <h2 className="eyebrow text-brand/70">Item {index + 1}</h2>
-            {fields.length > 1 ? (
+          title={`Item ${index + 1}`}
+          action={
+            fields.length > 1 ? (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => remove(index)}
-                className="text-brand-ink/50 hover:text-red-700"
+                className="-mr-2 text-brand-ink/45 hover:text-red-600"
               >
-                Hapus item
+                Hapus
               </Button>
-            ) : null}
-          </div>
-
-          <div className="flex flex-col gap-5 pt-5">
+            ) : null
+          }
+        >
+          <div className="flex flex-col gap-5">
             <Field
               label="Nama makanan"
               htmlFor={`items.${index}.name`}
@@ -111,6 +108,7 @@ export function DonationForm() {
             >
               <Input
                 id={`items.${index}.name`}
+                placeholder="Contoh: Nasi ayam bakar"
                 {...register(`items.${index}.name`)}
               />
             </Field>
@@ -131,8 +129,9 @@ export function DonationForm() {
               </Field>
 
               <Field
-                label="Ketahanan (jam)"
+                label="Ketahanan"
                 htmlFor={`items.${index}.shelfLifeHours`}
+                hint="Berapa jam lagi makanan ini masih aman dimakan."
                 error={errors.items?.[index]?.shelfLifeHours?.message}
               >
                 <Input
@@ -151,6 +150,7 @@ export function DonationForm() {
               <Field
                 label="Kuantitas"
                 htmlFor={`items.${index}.quantity`}
+                hint="Cara makanan dikemas."
                 error={errors.items?.[index]?.quantity?.message}
               >
                 <Input
@@ -166,6 +166,7 @@ export function DonationForm() {
               <Field
                 label="Satuan"
                 htmlFor={`items.${index}.unit`}
+                hint="Tray, box, porsi."
                 error={errors.items?.[index]?.unit?.message}
               >
                 <Input
@@ -177,6 +178,7 @@ export function DonationForm() {
               <Field
                 label="Estimasi porsi"
                 htmlFor={`items.${index}.servings`}
+                hint="Berapa orang yang kenyang. Angka ini yang dibagi ke panti."
                 error={errors.items?.[index]?.servings?.message}
               >
                 <Input
@@ -189,12 +191,6 @@ export function DonationForm() {
                 />
               </Field>
             </div>
-
-            <p className="rounded-lg bg-canvas px-3 py-2 text-sm text-brand-ink/55">
-              Kuantitas adalah cara makanan dikemas (2 tray, 5 box). Estimasi
-              porsi adalah berapa orang yang bisa dikenyangkan — angka inilah
-              yang dipakai membagi donasi ke penerima.
-            </p>
 
             <Field
               label="Bahan yang digunakan"
@@ -211,17 +207,19 @@ export function DonationForm() {
 
             <Field
               label="Alergen"
-              hint="Pilih alergen yang terkandung. Penerima dengan pantangan ini tidak akan dicocokkan dengan donasi tersebut."
+              hint="Panti dengan pantangan ini tidak akan dicocokkan dengan donasimu."
             >
               <Controller
                 control={control}
                 name={`items.${index}.allergens`}
-                render={({ field }) => (
+                render={({ field: allergenField }) => (
                   <ChipGroup
                     label="Alergen"
                     options={BASE_ALLERGENS}
-                    value={field.value as (typeof BASE_ALLERGENS)[number][]}
-                    onChange={field.onChange}
+                    value={
+                      allergenField.value as (typeof BASE_ALLERGENS)[number][]
+                    }
+                    onChange={allergenField.onChange}
                   />
                 )}
               />
@@ -230,33 +228,35 @@ export function DonationForm() {
             <Controller
               control={control}
               name={`items.${index}.isHalal`}
-              render={({ field }) => (
+              render={({ field: halalField }) => (
                 <SwitchField
                   id={`items.${index}.isHalal`}
                   label="Makanan ini halal"
                   description="Matikan bila mengandung bahan non-halal."
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
+                  checked={halalField.value}
+                  onCheckedChange={halalField.onChange}
                 />
               )}
             />
           </div>
-        </section>
+        </SectionCard>
       ))}
 
       <Button
         type="button"
         variant="outline"
         onClick={() => append(EMPTY_ITEM)}
-        className="w-full border-dashed"
+        className="h-12 w-full border-dashed text-brand-ink/60 hover:border-brand/50 hover:text-brand-ink"
       >
+        <Plus className="size-4" aria-hidden />
         Tambah item makanan
       </Button>
 
-      <section className="rounded-xl border border-brand-ink/10 bg-white p-5">
+      <div className="rounded-xl border border-brand-ink/8 bg-white p-5">
         <Field
           label="Catatan untuk penerima"
           htmlFor="notes"
+          hint="Opsional. Waktu pengambilan, patokan lokasi, atau hal lain yang perlu diketahui panti."
           error={errors.notes?.message}
         >
           <Textarea
@@ -266,32 +266,29 @@ export function DonationForm() {
             {...register("notes")}
           />
         </Field>
-      </section>
-
-      <div
-        className={cn(
-          "flex items-baseline justify-between gap-4 rounded-xl border px-5 py-4",
-          totalServings > 0
-            ? "border-brand bg-brand-tint/40"
-            : "border-brand-ink/10 bg-white",
-        )}
-      >
-        <span className="text-sm text-brand-ink/55">Total porsi donasi</span>
-        <span className="flex items-baseline gap-2">
-          <span className="numeric text-2xl font-semibold text-brand-ink">
-            {totalServings}
-          </span>
-          <span className="text-sm text-brand-ink/55">porsi</span>
-        </span>
       </div>
 
       {errors.items?.root ? (
-        <p className="text-sm text-red-700">{errors.items.root.message}</p>
+        <p className="text-sm font-medium text-red-600">
+          {errors.items.root.message}
+        </p>
       ) : null}
 
-      <Button type="submit" disabled={isSubmitting} size="lg">
-        {isSubmitting ? "Menyimpan..." : "Simpan donasi"}
-      </Button>
+      <div className="sticky bottom-4 mt-2 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-ink/12 bg-white px-5 py-4 shadow-[0_2px_4px_rgba(16,36,28,0.06),0_18px_44px_-12px_rgba(16,36,28,0.32)]">
+        <div>
+          <p className="text-sm text-brand-ink/50">Total porsi donasi</p>
+          <p className="mt-0.5">
+            <span className="numeric text-2xl font-semibold text-brand-ink">
+              {totalServings}
+            </span>
+            <span className="ml-1.5 text-sm text-brand-ink/45">porsi</span>
+          </p>
+        </div>
+
+        <Button type="submit" size="lg" disabled={isSubmitting}>
+          {isSubmitting ? "Menyimpan..." : "Simpan donasi"}
+        </Button>
+      </div>
     </form>
   );
 }

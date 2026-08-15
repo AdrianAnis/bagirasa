@@ -60,20 +60,20 @@ export function DonationList({ donations }: DonationListProps) {
         return (
           <article
             key={donation.id}
-            className="overflow-hidden rounded-xl border border-brand-ink/10 bg-white"
+            className="overflow-hidden rounded-xl border border-brand-ink/8 bg-white"
           >
-            <header className="flex flex-wrap items-start justify-between gap-4 border-b border-brand-ink/10 px-5 py-4">
+            <header className="flex flex-wrap items-start justify-between gap-4 border-b border-brand-ink/8 px-5 py-4">
               <div>
-                <p className="eyebrow text-brand-ink/40">
-                  {formatDate(donation.created_at)}
-                </p>
-                <p className="mt-1 flex items-baseline gap-2">
+                <p className="flex items-baseline gap-2">
                   <span className="numeric text-2xl font-semibold text-brand-ink">
                     {totalServings}
                   </span>
                   <span className="text-sm text-brand-ink/55">
                     porsi · {donation.food_items.length} item
                   </span>
+                </p>
+                <p className="mt-1 text-sm text-brand-ink/45">
+                  {formatDate(donation.created_at)}
                 </p>
               </div>
               <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
@@ -102,7 +102,7 @@ export function DonationList({ donations }: DonationListProps) {
             </ul>
 
             {notes.length > 0 || isPending ? (
-              <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-brand-ink/10 bg-canvas px-5 py-4">
+              <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-brand-ink/8 bg-canvas px-5 py-4">
                 <span className="text-sm text-brand-ink/55">
                   {notes.join(" · ")}
                 </span>

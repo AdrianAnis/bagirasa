@@ -15,15 +15,13 @@ export default async function DonorProfilePage() {
   const donor = await getCurrentDonor();
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
       <PageHeader
         title="Profil restoran"
         description="Lokasi menentukan panti mana yang dicocokkan dengan donasimu. Dokumen KTP dipakai admin untuk verifikasi dan disimpan di penyimpanan privat."
       />
 
-      <div className="max-w-2xl">
-        <DonorProfileForm userId={profile.id} donor={donor} />
-      </div>
+      <DonorProfileForm userId={profile.id} donor={donor} />
     </div>
   );
 }
