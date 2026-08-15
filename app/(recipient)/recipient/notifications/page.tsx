@@ -14,7 +14,6 @@ export default async function RecipientNotificationsPage() {
   return (
     <div className="flex flex-col gap-10">
       <PageHeader
-        eyebrow="Penerima"
         title="Notifikasi"
         description="Kabar donasi masuk dari restoran di sekitarmu."
       />

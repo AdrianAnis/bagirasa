@@ -6,7 +6,6 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { Button } from "@/components/ui/button";
 import { listRecipientMatches } from "@/lib/db/matches";
 import { getCurrentRecipient } from "@/lib/db/recipients";
-import { RECIPIENT_TYPE_LABEL } from "@/lib/validations/recipient";
 
 export default async function RecipientDashboardPage() {
   const [recipient, matches] = await Promise.all([
@@ -34,7 +33,6 @@ export default async function RecipientDashboardPage() {
   return (
     <div className="flex flex-col gap-10">
       <PageHeader
-        eyebrow={recipient ? RECIPIENT_TYPE_LABEL[recipient.type] : "Penerima"}
         title={recipient?.name ?? "Dashboard penerima"}
         description={recipient?.address ?? "Profil lembaga belum lengkap."}
         actions={

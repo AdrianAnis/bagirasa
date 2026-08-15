@@ -14,7 +14,6 @@ export default async function DonorNotificationsPage() {
   return (
     <div className="flex flex-col gap-10">
       <PageHeader
-        eyebrow="Penyumbang"
         title="Notifikasi"
         description="Kabar dari penerima donasimu — jawaban terima atau tolak, dan konfirmasi penyerahan."
       />

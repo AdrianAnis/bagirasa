@@ -1,10 +1,5 @@
-import Link from "next/link";
-
-import { DonationList } from "@/components/donation/DonationList";
-import { EmptyState } from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { RatingStars } from "@/components/shared/RatingStars";
-import { Button } from "@/components/ui/button";
 import { listDonorDonations } from "@/lib/db/donations";
 import { getCurrentDonor } from "@/lib/db/donors";
 import { listDonorFeedback } from "@/lib/db/feedback";
@@ -42,14 +37,8 @@ export default async function DonorDashboardPage() {
   return (
     <div className="flex flex-col gap-10">
       <PageHeader
-        eyebrow="Penyumbang"
         title={donor?.name ?? "Dashboard donor"}
         description={donor?.address ?? "Profil restoran belum lengkap."}
-        actions={
-          <Button asChild>
-            <Link href="/donor/donations/new">Buat donasi</Link>
-          </Button>
-        }
       />
 
       <dl className="grid gap-px overflow-hidden rounded-xl border border-brand-ink/10 bg-brand-ink/10 sm:grid-cols-2 lg:grid-cols-4">
@@ -97,23 +86,6 @@ export default async function DonorDashboardPage() {
           </ul>
         </section>
       ) : null}
-
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-brand-ink">Histori donasi</h2>
-        {donations.length === 0 ? (
-          <EmptyState
-            title="Belum ada donasi"
-            description="Catat sisa makanan hari ini, lalu salurkan ke panti terdekat yang membutuhkan."
-            action={
-              <Button asChild>
-                <Link href="/donor/donations/new">Buat donasi</Link>
-              </Button>
-            }
-          />
-        ) : (
-          <DonationList donations={donations} />
-        )}
-      </section>
     </div>
   );
 }
