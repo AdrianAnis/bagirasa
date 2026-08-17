@@ -1,6 +1,7 @@
 import Link from "next/link";
 
-import { AllocationDiagram } from "@/components/landing/AllocationDiagram";
+import { Hero } from "@/components/landing/Hero";
+import { PhotoBand } from "@/components/landing/PhotoBand";
 import { Button } from "@/components/ui/button";
 
 const PROBLEMS = [
@@ -59,32 +60,12 @@ const SAFEGUARDS = [
 export default function LandingPage() {
   return (
     <>
-      <section className="mx-auto grid w-full max-w-5xl items-center gap-12 px-4 py-16 md:grid-cols-[1.05fr_1fr] md:py-24">
-        <div>
-          <p className="eyebrow text-brand/70">Semarang</p>
-          <h1 className="mt-4 text-display font-semibold text-brand-ink">
-            Sisa makan malam, sampai sebelum dingin.
-          </h1>
-          <p className="mt-5 max-w-md text-lg leading-relaxed text-brand-ink/60">
-            BagiRasa menghubungkan rumah makan yang punya surplus dengan panti
-            asuhan dan rumah lansia terdekat yang sedang membutuhkan — lengkap
-            dengan informasi bahan dan alergen.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild size="lg">
-              <Link href="/choose-role">Mulai menyumbang</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="#cara-kerja">Lihat cara kerjanya</Link>
-            </Button>
-          </div>
-        </div>
+      <Hero />
 
-        <AllocationDiagram />
-      </section>
+      <PhotoBand />
 
       <section className="border-y border-brand-ink/10 bg-canvas">
-        <div className="mx-auto w-full max-w-5xl px-4 py-16">
+        <div className="mx-auto w-full max-w-6xl px-6 py-16">
           <p className="eyebrow text-brand/70">Yang terjadi tanpa jembatan</p>
           <div className="mt-8 grid gap-8 md:grid-cols-3">
             {PROBLEMS.map((problem) => (
@@ -99,7 +80,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="cara-kerja" className="mx-auto w-full max-w-5xl px-4 py-20">
+      <section id="cara-kerja" className="mx-auto w-full max-w-6xl px-6 py-20">
         <p className="eyebrow text-brand/70">Cara kerja</p>
         <h2 className="mt-3 max-w-lg text-title font-semibold text-brand-ink">
           Empat langkah, dari dapur ke meja makan panti.
@@ -124,7 +105,7 @@ export default function LandingPage() {
       </section>
 
       <section id="keamanan" className="border-t border-brand-ink/10 bg-brand-ink">
-        <div className="mx-auto w-full max-w-5xl px-4 py-20">
+        <div className="mx-auto w-full max-w-6xl px-6 py-20">
           <p className="eyebrow text-brand-tint/60">Kepercayaan</p>
           <h2 className="mt-3 max-w-xl text-title font-semibold text-white">
             Donasi makanan hanya berjalan kalau kedua pihak merasa aman.
@@ -146,7 +127,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-5xl px-4 py-20">
+      <section className="mx-auto w-full max-w-6xl px-6 py-20">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="max-w-lg">
             <h2 className="text-title font-semibold text-brand-ink">

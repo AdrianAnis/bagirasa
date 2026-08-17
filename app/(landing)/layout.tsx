@@ -12,7 +12,7 @@ export default function LandingLayout({
   return (
     <div className="flex min-h-svh flex-col bg-white">
       <header className="sticky top-0 z-40 border-b border-brand-ink/10 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex h-16 w-full max-w-5xl items-center gap-6 px-4">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-6 px-6">
           <Logo />
           <nav className="ml-auto flex items-center gap-2">
             <Link
@@ -40,7 +40,7 @@ export default function LandingLayout({
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-brand-ink/10 bg-canvas">
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-12">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
           <div className="flex flex-wrap items-start justify-between gap-8">
             <div className="max-w-sm">
               <Logo />
