@@ -13,7 +13,7 @@
   --color-chart: #0f8a57;
   --color-chart-soft: #cfe8dc;
   --color-brand-light: #8fdcb6;
-  --font-mono: var(--font-plex-mono);
+  --font-mono: var(--font-poppins);
   --text-hero: clamp(2.25rem, 5vw, 4.25rem);
   --text-hero--line-height: 1.06;
   --text-hero--letter-spacing: -0.035em;
@@ -32,7 +32,7 @@
 }
 
 @utility eyebrow {
-  font-family: var(--font-plex-mono);
+  font-family: var(--font-poppins);
   font-size: var(--text-eyebrow);
   letter-spacing: var(--text-eyebrow--letter-spacing);
   text-transform: uppercase;
@@ -40,7 +40,7 @@
 }
 
 @utility numeric {
-  font-family: var(--font-plex-mono);
+  font-family: var(--font-poppins);
   font-variant-numeric: tabular-nums;
 }
 
