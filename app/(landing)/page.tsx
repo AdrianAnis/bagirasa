@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Hero } from "@/components/landing/Hero";
-import { PhotoBand } from "@/components/landing/PhotoBand";
+
 import { Button } from "@/components/ui/button";
 
 const PROBLEMS = [
@@ -62,7 +62,7 @@ export default function LandingPage() {
     <>
       <Hero />
 
-      <PhotoBand />
+
 
       <section className="border-y border-brand-ink/10 bg-canvas">
         <div className="mx-auto w-full max-w-6xl px-6 py-16">
@@ -130,8 +130,8 @@ export default function LandingPage() {
       <section className="mx-auto w-full max-w-6xl px-6 py-20">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="max-w-lg">
-            <h2 className="text-title font-semibold text-brand-ink">
-              Punya sisa makanan malam ini?
+            <h2 className="text-title font-semibold text-brand-ink whitespace-nowrap">
+              Punya sisa makanan malam ini? Ayo donasi!
             </h2>
             <p className="mt-3 text-brand-ink/60">
               Daftar sebagai penyumbang, lengkapi profil restoran, dan catat
