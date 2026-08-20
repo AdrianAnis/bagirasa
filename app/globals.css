@@ -192,6 +192,15 @@
   }
 }
 
+html.hero-visible {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html.hero-visible::-webkit-scrollbar {
+  display: none;
+}
+
 ::-webkit-scrollbar {
   background-color: transparent;
   width: 6px;

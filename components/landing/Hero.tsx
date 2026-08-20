@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 import { LANDING_EASE } from "@/components/landing/Reveal";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,30 @@ const SPECS = [
 
 export function Hero() {
   const prefersReducedMotion = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        document.documentElement.classList.toggle(
+          "hero-visible",
+          entry.isIntersecting
+        );
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(section);
+    document.documentElement.classList.add("hero-visible");
+
+    return () => {
+      observer.disconnect();
+      document.documentElement.classList.remove("hero-visible");
+    };
+  }, []);
 
   const enter = (delay: number) => ({
     initial: prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 18 },
@@ -23,7 +48,10 @@ export function Hero() {
   });
 
   return (
-    <section className="relative isolate flex min-h-screen w-full items-center justify-center overflow-hidden">
+    <section
+      ref={sectionRef}
+      className="relative isolate flex min-h-screen w-full items-center justify-center overflow-hidden"
+    >
 
       <div
         aria-hidden
