@@ -49,6 +49,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: none;
@@ -181,10 +182,33 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
+}
+
+::-webkit-scrollbar {
+  background-color: transparent;
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-brand);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-brand-deep);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--color-brand-deep);
+}
+
+::-webkit-scrollbar-thumb:disabled {
+  background-color: var(--color-brand-deep);
 }
