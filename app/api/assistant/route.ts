@@ -1,5 +1,7 @@
 import { refreshInsight } from "@/lib/db/insights";
 
+export const maxDuration = 60;
+
 export async function POST(): Promise<Response> {
   const result = await refreshInsight();
 
