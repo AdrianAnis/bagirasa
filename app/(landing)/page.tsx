@@ -130,7 +130,7 @@ export default function LandingPage() {
       <section className="mx-auto w-full max-w-6xl px-6 py-20">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="max-w-lg">
-            <h2 className="text-title font-semibold text-brand-ink whitespace-nowrap">
+            <h2 className="text-title font-semibold text-brand-ink">
               Punya sisa makanan malam ini? Ayo donasi!
             </h2>
             <p className="mt-3 text-brand-ink/60">
