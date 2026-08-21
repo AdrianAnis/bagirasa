@@ -46,7 +46,7 @@ export default function LandingLayout({
               <Logo />
               <p className="mt-3 text-sm text-brand-ink/55">
                 Menyalurkan surplus makanan layak konsumsi dari rumah makan ke
-                panti asuhan dan rumah lansia di Semarang.
+                lembaga penerima di Semarang.
               </p>
             </div>
 

@@ -33,7 +33,7 @@ const STEPS: RegisterStep[] = [
   },
   {
     title: "Data restoran",
-    description: "Identitas dan lokasi yang akan dilihat panti penerima.",
+    description: "Identitas dan lokasi yang akan dilihat lembaga penerima.",
   },
   {
     title: "Dokumen verifikasi",

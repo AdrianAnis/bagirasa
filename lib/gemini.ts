@@ -52,7 +52,7 @@ function buildPrompt(payload: unknown): string {
     "- peakWindow: kapan surplus paling sering muncul, misal 'malam hari sekitar pukul 20.00'.",
     "- impact: pakai angka yang sudah dihitung di data, jangan mengarang angka baru.",
     "- recommendations: 3 saran praktis untuk mengurangi surplus atau menyalurkannya lebih cepat.",
-    "- Jangan menyebut nama panti tertentu. Jangan memberi klaim medis atau gizi.",
+    "- Jangan menyebut nama lembaga tertentu. Jangan memberi klaim medis atau gizi.",
     "",
     "Data:",
     JSON.stringify(payload),

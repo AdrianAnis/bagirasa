@@ -46,7 +46,7 @@ export function PhotoBand() {
         <Reveal delay={0.1}>
           <p className="mt-5 max-w-lg text-[0.9375rem] leading-relaxed text-white/60">
             Setiap malam rumah makan di Semarang menutup dapur dengan makanan
-            yang masih layak. Panti di seberang jalan tidak pernah tahu.
+            yang masih layak. Lembaga di seberang jalan tidak pernah tahu.
           </p>
         </Reveal>
       </div>

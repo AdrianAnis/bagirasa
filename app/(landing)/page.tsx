@@ -11,11 +11,11 @@ const PROBLEMS = [
   },
   {
     title: "Distribusi menumpuk",
-    body: "Penyaluran manual cenderung ke panti yang itu-itu saja. Yang jauh dari jaringan pertemanan pengurus jarang kebagian.",
+    body: "Penyaluran manual cenderung ke lembaga yang itu-itu saja. Yang jauh dari jaringan pertemanan pengurus jarang kebagian.",
   },
   {
     title: "Isi makanan tidak jelas",
-    body: "Pengurus panti menerima makanan tanpa tahu bahannya. Satu anak dengan alergi kacang cukup untuk membuat donasi jadi masalah.",
+    body: "Pengurus lembaga menerima makanan tanpa tahu bahannya. Satu anak dengan alergi kacang cukup untuk membuat donasi jadi masalah.",
   },
 ];
 
@@ -30,18 +30,18 @@ const STEPS = [
   },
   {
     title: "Penerima memutuskan",
-    body: "Panti melihat rincian bahan dan alergen sebelum menjawab, lalu menerima atau menolak.",
+    body: "Penerima dapat melihat rincian bahan dan alergen sebelum menjawab, lalu menerima atau menolak.",
   },
   {
     title: "Penyerahan dikonfirmasi",
-    body: "Setelah makanan diterima, kebutuhan panti berkurang otomatis dan giliran berikutnya bergeser ke yang lain.",
+    body: "Setelah makanan diterima, kebutuhan lembaga berkurang otomatis dan giliran berikutnya bergeser ke yang lain.",
   },
 ];
 
 const SAFEGUARDS = [
   {
     title: "Identitas diverifikasi",
-    body: "Restoran mengunggah KTP, panti mengunggah dokumen legal. Admin memeriksa sebelum akun bisa bertransaksi.",
+    body: "Restoran mengunggah KTP, lembaga mengunggah dokumen legal. Admin memeriksa sebelum akun bisa bertransaksi.",
   },
   {
     title: "Data terisolasi per peran",

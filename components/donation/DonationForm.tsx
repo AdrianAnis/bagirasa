@@ -178,7 +178,7 @@ export function DonationForm() {
               <Field
                 label="Estimasi porsi"
                 htmlFor={`items.${index}.servings`}
-                hint="Berapa orang yang kenyang. Angka ini yang dibagi ke panti."
+                hint="Berapa orang yang kenyang. Angka ini yang dibagi ke lembaga penerima."
                 error={errors.items?.[index]?.servings?.message}
               >
                 <Input
@@ -207,7 +207,7 @@ export function DonationForm() {
 
             <Field
               label="Alergen"
-              hint="Panti dengan pantangan ini tidak akan dicocokkan dengan donasimu."
+              hint="Lembaga dengan pantangan ini tidak akan dicocokkan dengan donasimu."
             >
               <Controller
                 control={control}
@@ -256,7 +256,7 @@ export function DonationForm() {
         <Field
           label="Catatan untuk penerima"
           htmlFor="notes"
-          hint="Opsional. Waktu pengambilan, patokan lokasi, atau hal lain yang perlu diketahui panti."
+          hint="Opsional. Waktu pengambilan, patokan lokasi, atau hal lain yang perlu diketahui lembaga penerima."
           error={errors.notes?.message}
         >
           <Textarea

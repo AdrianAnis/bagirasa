@@ -77,9 +77,9 @@ export function Hero() {
           {...enter(0.08)}
           className="mt-7 max-w-2xl text-[1.0625rem] leading-[1.7] text-white/70"
         >
-          BagiRasa mencocokkan surplus rumah makan di Semarang dengan panti asuhan
-          dan rumah lansia terdekat yang sedang butuh — lengkap dengan rincian
-          bahan dan alergen.
+          BagiRasa mencocokkan surplus rumah makan di Semarang dengan lembaga
+          penerima terdekat yang sedang butuh — lengkap dengan rincian bahan
+          dan alergen.
         </motion.p>
 
         <motion.div {...enter(0.16)} className="mt-9 flex flex-wrap gap-3">

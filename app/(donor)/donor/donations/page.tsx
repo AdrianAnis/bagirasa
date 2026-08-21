@@ -19,7 +19,7 @@ export default async function DonorDonationsPage() {
       {donations.length === 0 ? (
         <EmptyState
           title="Belum ada donasi"
-          description="Catat sisa makanan hari ini, lalu salurkan ke panti terdekat yang membutuhkan."
+          description="Catat sisa makanan hari ini, lalu salurkan ke lembaga terdekat yang membutuhkan."
           action={
             <Button asChild>
               <Link href="/donor/donations/new">Buat donasi</Link>

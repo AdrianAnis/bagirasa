@@ -35,7 +35,7 @@ export async function listNearbyRecipients(): Promise<NearbyRecipients | null> {
   const { data, error } = await supabase.rpc("verified_recipients");
 
   if (error) {
-    throw new Error(`Gagal memuat daftar panti: ${error.message}`);
+    throw new Error(`Gagal memuat daftar lembaga: ${error.message}`);
   }
 
   const origin = { lat: Number(donor.lat), lng: Number(donor.lng) };

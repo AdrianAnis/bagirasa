@@ -13,7 +13,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "BagiRasa",
   description:
-    "Platform penyaluran surplus makanan dari restoran ke panti asuhan dan rumah lansia.",
+    "Platform penyaluran surplus makanan dari restoran ke lembaga penerima.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
