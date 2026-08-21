@@ -110,13 +110,13 @@ export default async function DonorRecipientsPage() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
-        title="Panti terdekat"
+        title="Lembaga terdekat"
         description={`Panti asuhan dan rumah lansia yang sudah terverifikasi di sekitar restoranmu. Donasi hanya dicocokkan dengan yang berada dalam radius ${MAX_RADIUS_KM} km.`}
       />
 
       {nearby.recipients.length === 0 ? (
         <EmptyState
-          title="Belum ada panti terverifikasi"
+          title="Belum ada lembaga terverifikasi"
           description="Begitu ada panti asuhan atau rumah lansia yang lolos verifikasi admin, mereka akan muncul di peta ini."
         />
       ) : (
@@ -134,7 +134,7 @@ export default async function DonorRecipientsPage() {
               <dd className="numeric mt-2 text-3xl font-semibold text-brand-ink">
                 {inRadius.length}
                 <span className="ml-1.5 text-base font-medium text-brand-ink/35">
-                  panti
+                  lembaga
                 </span>
               </dd>
             </div>
@@ -145,7 +145,7 @@ export default async function DonorRecipientsPage() {
               <dd className="numeric mt-2 text-3xl font-semibold text-brand-ink">
                 {openNow.length}
                 <span className="ml-1.5 text-base font-medium text-brand-ink/35">
-                  panti
+                  lembaga
                 </span>
               </dd>
             </div>

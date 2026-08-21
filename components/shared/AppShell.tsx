@@ -18,7 +18,7 @@ const NOTIFICATIONS_HREF: Record<string, string> = {
 const NAV_LINKS: Record<string, NavLink[]> = {
   donor: [
     { href: "/donor", label: "Dashboard" },
-    { href: "/donor/recipients", label: "Panti terdekat" },
+    { href: "/donor/recipients", label: "Lembaga terdekat" },
     { href: "/donor/donations", label: "Histori" },
   ],
   recipient: [

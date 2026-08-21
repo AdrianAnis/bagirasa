@@ -18,7 +18,7 @@ const ROLES = [
     icon: HeartHandshake,
     title: "Kami membutuhkan makanan",
     description:
-      "Panti asuhan atau rumah lansia yang siap menerima donasi makanan.",
+      "Lembaga sosial yang siap menerima donasi makanan.",
     action: "Daftar sebagai penerima",
   },
 ];

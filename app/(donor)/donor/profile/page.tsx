@@ -18,7 +18,7 @@ export default async function DonorProfilePage() {
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-8">
       <PageHeader
         title="Profil restoran"
-        description="Lokasi menentukan panti mana yang dicocokkan dengan donasimu. Dokumen KTP dipakai admin untuk verifikasi dan disimpan di penyimpanan privat."
+        description="Lokasi menentukan lembaga mana yang dicocokkan dengan donasimu. Dokumen KTP dipakai admin untuk verifikasi dan disimpan di penyimpanan privat."
       />
 
       <DonorProfileForm userId={profile.id} donor={donor} />

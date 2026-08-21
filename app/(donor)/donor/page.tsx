@@ -54,7 +54,7 @@ export default async function DonorDashboardPage() {
       {analytics.totalDonations === 0 ? (
         <EmptyState
           title="Belum ada donasi"
-          description="Catat sisa makanan hari ini, lalu salurkan ke panti terdekat yang membutuhkan. Grafik dan insight akan muncul setelah donasi pertamamu."
+          description="Catat sisa makanan hari ini, lalu salurkan ke lembaga terdekat yang membutuhkan. Grafik dan insight akan muncul setelah donasi pertamamu."
           action={
             <Button asChild>
               <Link href="/donor/donations/new">Buat donasi</Link>
